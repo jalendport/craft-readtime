@@ -48,4 +48,18 @@ Seconds are included by default, but can be disabled by using `|readingTime(fals
 Returns: 1 second
 ```
 
+## Overriding Plugin Settings
+
+If you create a [config file](https://docs.craftcms.com/v3/configuration.html) in your `config` folder called `reading-time.php`, you can override the plugin’s settings in the Control Panel. Since that config file is fully [multi-environment](https://docs.craftcms.com/v3/configuration.html) aware, this is a handy way to have different settings across multiple environments.
+
+Here’s what that config file might look like along with a list of all of the possible values you can override.
+
+```php
+<?php
+
+return [
+    'wordsPerMinute' => 200
+];
+```
+
 Brought to you by [Luke Youell](https://github.com/lukeyouell)
