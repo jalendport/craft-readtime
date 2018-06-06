@@ -1,0 +1,24 @@
+{% import "_includes/forms" as forms %}
+
+{% macro configWarning(setting) -%}
+  {% set setting = '<code>' ~ setting ~ '</code>' %}
+  {{ 'This is being overridden by the {setting} config setting in your {file} config file.'|t('reading-time', {
+        setting: setting,
+        file:    'reading-time.php'
+  })|raw }}
+{%- endmacro %}
+
+{% from _self import configWarning %}
+
+{{ forms.textField({
+    first:        true,
+    required:     true,
+    label:        'Words per Minute',
+    instructions: 'This is used to calculate the average reading time. Average readers reach around 200 wpm.',
+    placeholder:  '200',
+    id:           'wordsPerMinute',
+    name:         'wordsPerMinute',
+    value:        settings.wordsPerMinute,
+    disabled:     'wordsPerMinute' in overrides,
+    warning:      'wordsPerMinute' in overrides ? configWarning('wordsPerMinute'),
+}) }}

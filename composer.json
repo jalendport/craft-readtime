@@ -1,0 +1,40 @@
+{
+    "name": "lukeyouell/craft-readingtime",
+    "description": "Calculate the estimated reading time for content.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "average reading time"
+    ],
+    "support": {
+        "docs": "https://github.com/lukeyouell/craft-readingtime/blob/master/README.md",
+        "issues": "https://github.com/lukeyouell/craft-readingtime/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luke Youell",
+            "homepage": "https://github.com/lukeyouell"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "lukeyouell\\readingtime\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Reading Time",
+        "handle": "reading-time",
+        "hasCpSettings": true,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/lukeyouell/craft-readingtime/master/CHANGELOG.md",
+        "class": "lukeyouell\\readingtime\\ReadingTime"
+    }
+}
