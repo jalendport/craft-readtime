@@ -40,12 +40,24 @@ The `|readingTime` filter returns a human time duration of how long it takes the
 
 Seconds are included by default, but can be disabled by using `|readingTime(false)`
 
-#### Example
+#### Examples
 
 ```twig
-{{ 'Sed scelerisque tellus vel faucibus luctus.'|readingTime }}
+{{ string|readingTime }}
 
-Returns: 1 second
+Returns: 30 second
+```
+
+```twig
+{{ richTextField|readingTime }}
+
+Returns: 2 minutes, 40 seconds
+```
+
+```twig
+{{ richTextField|readingTime(false) }}
+
+Returns: 3 minutes
 ```
 
 ## Overriding Plugin Settings
