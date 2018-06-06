@@ -1,16 +1,16 @@
 <?php
 /**
- * Reading Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 3.x
  *
- * Calculate the estimated reading time for content.
+ * Calculate the estimated read time for content.
  *
  * @link      https://github.com/lukeyouell
  * @copyright Copyright (c) 2018 Luke Youell
  */
 
-namespace lukeyouell\readingtime\models;
+namespace lukeyouell\readtime\models;
 
-use lukeyouell\readingtime\ReadingTime;
+use lukeyouell\readtime\ReadTime;
 
 use Craft;
 use craft\base\Model;
