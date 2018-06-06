@@ -1,0 +1,12 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+    first:        true,
+    required:     true,
+    label:        'Words per Minute',
+    instructions: 'This is used to calculate the average reading time. Average readers reach around 200 wpm.',
+    placeholder:  '200',
+    id:           'wordsPerMinute',
+    name:         'wordsPerMinute',
+    value:        settings.wordsPerMinute,
+}) }}
