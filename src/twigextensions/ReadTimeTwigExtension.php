@@ -1,40 +1,40 @@
 <?php
 /**
- * Reading Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 3.x
  *
- * Calculate the estimated reading time for content.
+ * Calculate the estimated read time for content.
  *
  * @link      https://github.com/lukeyouell
  * @copyright Copyright (c) 2018 Luke Youell
  */
 
-namespace lukeyouell\readingtime\twigextensions;
+namespace lukeyouell\readtime\twigextensions;
 
-use lukeyouell\readingtime\ReadingTime;
+use lukeyouell\readtime\ReadTime;
 
 use Craft;
 use craft\helpers\DateTimeHelper;
 
-class ReadingTimeTwigExtension extends \Twig_Extension
+class ReadTimeTwigExtension extends \Twig_Extension
 {
     // Public Methods
     // =========================================================================
 
     public function getName()
     {
-        return 'readingTime';
+        return 'readTime';
     }
 
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('readingTime', [$this, 'readingTime']),
+            new \Twig_SimpleFilter('readTime', [$this, 'readTime']),
         ];
     }
 
-    public function readingTime($value = null, $showSeconds = true)
+    public function readTime($value = null, $showSeconds = true)
     {
-        $settings = ReadingTime::$plugin->getSettings();
+        $settings = ReadTime::$plugin->getSettings();
 
         $value = is_array($value) ? implode(' ', $value) : (string)$value;
         $wpm = $settings->wordsPerMinute;

@@ -2,11 +2,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480">
   <defs>
     <style>
-      .averagereadingtime-cls-1 { fill: #f94e3f; }
-      .averagereadingtime-cls-2 { fill: #fff; }
+      .readtime-cls-1 { fill: #f94e3f; }
+      .readtime-cls-2 { fill: #fff; }
     </style>
   </defs>
-  <title>average-reading-time-icon</title>
-  <circle class="averagereadingtime-cls-1" cx="240" cy="240" r="240"/>
-  <path class="averagereadingtime-cls-2" d="M274.29,120H205.71v22.86h68.58ZM228.57,268.57h22.86V200H228.57ZM320.34,193l16.23-16.23a125.74,125.74,0,0,0-16.11-16.11l-16.23,16.22A102.94,102.94,0,1,0,320.34,193ZM240,337.14a80,80,0,1,1,80-80A79.94,79.94,0,0,1,240,337.14Z"/>
+  <title>read-time-icon</title>
+  <circle class="readtime-cls-1" cx="240" cy="240" r="240"/>
+  <path class="readtime-cls-2" d="M274.29,120H205.71v22.86h68.58ZM228.57,268.57h22.86V200H228.57ZM320.34,193l16.23-16.23a125.74,125.74,0,0,0-16.11-16.11l-16.23,16.22A102.94,102.94,0,1,0,320.34,193ZM240,337.14a80,80,0,1,1,80-80A79.94,79.94,0,0,1,240,337.14Z"/>
 </svg>

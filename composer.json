@@ -1,18 +1,18 @@
 {
-    "name": "lukeyouell/craft-readingtime",
-    "description": "Calculate the estimated reading time for content.",
+    "name": "lukeyouell/craft-readtime",
+    "description": "Calculate the estimated read time for content.",
     "type": "craft-plugin",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "keywords": [
         "craft",
         "cms",
         "craftcms",
         "craft-plugin",
-        "average reading time"
+        "average read time"
     ],
     "support": {
-        "docs": "https://github.com/lukeyouell/craft-readingtime/blob/master/README.md",
-        "issues": "https://github.com/lukeyouell/craft-readingtime/issues"
+        "docs": "https://github.com/lukeyouell/craft-readtime/blob/master/README.md",
+        "issues": "https://github.com/lukeyouell/craft-readtime/issues"
     },
     "license": "MIT",
     "authors": [
@@ -26,15 +26,15 @@
     },
     "autoload": {
         "psr-4": {
-          "lukeyouell\\readingtime\\": "src/"
+          "lukeyouell\\readtime\\": "src/"
         }
     },
     "extra": {
-        "name": "Reading Time",
-        "handle": "reading-time",
+        "name": "Read Time",
+        "handle": "read-time",
         "hasCpSettings": true,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/lukeyouell/craft-readingtime/master/CHANGELOG.md",
-        "class": "lukeyouell\\readingtime\\ReadingTime"
+        "changelogUrl": "https://raw.githubusercontent.com/lukeyouell/craft-readtime/master/CHANGELOG.md",
+        "class": "lukeyouell\\readtime\\ReadTime"
     }
 }

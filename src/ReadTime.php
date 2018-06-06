@@ -1,17 +1,17 @@
 <?php
 /**
- * Reading Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 3.x
  *
- * Calculate the estimated reading time for content.
+ * Calculate the estimated read time for content.
  *
  * @link      https://github.com/lukeyouell
  * @copyright Copyright (c) 2018 Luke Youell
  */
 
-namespace lukeyouell\readingtime;
+namespace lukeyouell\readtime;
 
-use lukeyouell\readingtime\models\Settings;
-use lukeyouell\readingtime\twigextensions\ReadingTimeTwigExtension;
+use lukeyouell\readtime\models\Settings;
+use lukeyouell\readtime\twigextensions\ReadTimeTwigExtension;
 
 use Craft;
 use craft\base\Plugin;
@@ -20,7 +20,7 @@ use craft\events\PluginEvent;
 
 use yii\base\Event;
 
-class ReadingTime extends Plugin
+class ReadTime extends Plugin
 {
     // Static Properties
     // =========================================================================
@@ -40,11 +40,11 @@ class ReadingTime extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        Craft::$app->view->registerTwigExtension(new ReadingTimeTwigExtension());
+        Craft::$app->view->registerTwigExtension(new ReadTimeTwigExtension());
 
         Craft::info(
             Craft::t(
-                'reading-time',
+                'read-time',
                 '{name} plugin loaded',
                 ['name' => $this->name]
             ),
@@ -70,7 +70,7 @@ class ReadingTime extends Plugin
         $overrides = Craft::$app->getConfig()->getConfigFromFile(strtolower($this->handle));
 
         return Craft::$app->view->renderTemplate(
-            'reading-time/settings',
+            'read-time/settings',
             [
                 'settings' => $settings,
                 'overrides' => array_keys($overrides)
