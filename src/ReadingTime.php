@@ -44,7 +44,7 @@ class ReadingTime extends Plugin
 
         Craft::info(
             Craft::t(
-                'average-reading-time',
+                'reading-time',
                 '{name} plugin loaded',
                 ['name' => $this->name]
             ),
@@ -63,7 +63,7 @@ class ReadingTime extends Plugin
     protected function settingsHtml(): string
     {
         return Craft::$app->view->renderTemplate(
-            'average-reading-time/settings',
+            'reading-time/settings',
             [
                 'settings' => $this->getSettings()
             ]

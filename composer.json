@@ -30,8 +30,8 @@
         }
     },
     "extra": {
-        "name": "Average Reading Time",
-        "handle": "average-reading-time",
+        "name": "Reading Time",
+        "handle": "reading-time",
         "hasCpSettings": true,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/lukeyouell/craft-readingtime/master/CHANGELOG.md",
