@@ -45,7 +45,7 @@ Seconds are included by default, but can be disabled by using `|readTime(false)`
 ```twig
 {{ string|readTime }}
 
-Returns: 30 second
+Returns: 30 seconds
 ```
 
 ```twig
