@@ -36,7 +36,7 @@ The average user read speed is set at 200 words per minute by default, this can 
 
 ## Using the Filter
 
-The `|readTime` filter returns a human time duration of how long it takes the average user to read the provided content. The value provided can be a string or an array of values.
+The `|readTime` filter returns the human time duration of how long it takes the average user to read the provided content. The value provided can be a string or an array of values.
 
 Seconds are included by default, but can be disabled by using `|readTime(false)`
 
@@ -60,6 +60,26 @@ Returns: 2 minutes, 40 seconds
 Returns: 3 minutes
 ```
 
+## Using the Function
+
+The `readTime()` function returns the average read time for the whole entry based on it's field layout.
+
+Seconds are included by default, but can be disabled by adding a second parameter of `false`
+
+#### Examples
+
+```twig
+{{ readTime(entry) }}
+
+Returns: 9 minutes, 40 seconds
+```
+
+```twig
+{{ readTime(entry, false) }}
+
+Returns: 10 minutes
+```
+
 ## Overriding Plugin Settings
 
 If you create a [config file](https://docs.craftcms.com/v3/configuration.html) in your `config` folder called `read-time.php`, you can override the plugin’s settings in the Control Panel. Since that config file is fully [multi-environment](https://docs.craftcms.com/v3/configuration.html) aware, this is a handy way to have different settings across multiple environments.
@@ -77,7 +97,5 @@ return [
 ## Roadmap
 
 Some things to do, and ideas for potential features:
-
-- Twig extension that calculates the read time for all of the fields that exist within a given entry `{{ readTime(entry) }}` for example
 
 Brought to you by [Luke Youell](https://github.com/lukeyouell)
