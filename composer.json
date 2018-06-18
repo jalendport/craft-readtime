@@ -2,7 +2,7 @@
     "name": "lukeyouell/craft-readtime",
     "description": "Calculate the estimated read time for content.",
     "type": "craft-plugin",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "keywords": [
         "craft",
         "cms",
