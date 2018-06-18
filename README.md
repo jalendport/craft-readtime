@@ -74,4 +74,10 @@ return [
 ];
 ```
 
+## Roadmap
+
+Some things to do, and ideas for potential features:
+
+- Twig extension that calculates the read time for all of the fields that exist within a given entry `{{ readTime(entry) }}` for example
+
 Brought to you by [Luke Youell](https://github.com/lukeyouell)
