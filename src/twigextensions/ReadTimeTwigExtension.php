@@ -14,6 +14,7 @@ use lukeyouell\readtime\ReadTime;
 
 use Craft;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\StringHelper;
 
 use yii\base\ErrorException;
 
@@ -43,17 +44,12 @@ class ReadTimeTwigExtension extends \Twig_Extension
 
     public function readTimeFunction($element, $showSeconds = true)
     {
-        $settings = ReadTime::$plugin->getSettings();
-        $wpm = $settings->wordsPerMinute;
         $totalSeconds = 0;
 
         foreach ($element->getFieldLayout()->getFields() as $field) {
             try {
-                $fieldVal = $element->getFieldValue($field->handle);
-
-                $value = is_array($fieldVal) ? implode(' ', $fieldVal) : (string)$fieldVal;
-                $words = str_word_count(strip_tags($value));
-                $seconds = floor($words / $wpm * 60);
+                $value = $element->getFieldValue($field->handle);
+                $seconds = $this->valToSeconds($value);
 
                 $totalSeconds = $totalSeconds + $seconds;
             } catch (ErrorException $e) {
@@ -68,16 +64,24 @@ class ReadTimeTwigExtension extends \Twig_Extension
 
     public function readTimeFilter($value = null, $showSeconds = true)
     {
-        $settings = ReadTime::$plugin->getSettings();
-
-        $value = is_array($value) ? implode(' ', $value) : (string)$value;
-        $wpm = $settings->wordsPerMinute;
-
-        $words = str_word_count(strip_tags($value));
-        $seconds = floor($words / $wpm * 60);
-
+        $seconds = $this->valToSeconds($value);
         $duration = DateTimeHelper::secondsToHumanTimeDuration($seconds, $showSeconds);
 
         return $duration;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    private function valToSeconds($value)
+    {
+        $settings = ReadTime::$plugin->getSettings();
+        $wpm = $settings->wordsPerMinute;
+
+        $string = StringHelper::toString($value);
+        $wordCount = StringHelper::countWords($string);
+        $seconds = floor($wordCount / $wpm * 60);
+
+        return $seconds;
     }
 }
