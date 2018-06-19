@@ -45,19 +45,32 @@ class ReadTimeTwigExtension extends \Twig_Extension
     public function readTimeFunction($element, $showSeconds = true)
     {
         $totalSeconds = 0;
+        $vals = '';
 
         foreach ($element->getFieldLayout()->getFields() as $field) {
             try {
-                $value = $element->getFieldValue($field->handle);
-                $seconds = $this->valToSeconds($value);
+                // If field is a matrix then loop through fields in block
+                if ($field instanceof craft\fields\Matrix) {
+                    foreach($element->getFieldValue($field->handle)->all() as $block) {
+                        $blockFields = $block->getFieldLayout()->getFields();
 
-                $totalSeconds = $totalSeconds + $seconds;
+                        foreach($blockFields as $blockField){
+                            $value = $block->getFieldValue($blockField->handle);
+                            $seconds = $this->valToSeconds($value);
+                            $totalSeconds = $totalSeconds + $seconds;
+                        }
+                    }
+                } else {
+                  $value = $element->getFieldValue($field->handle);
+                  $seconds = $this->valToSeconds($value);
+                  $totalSeconds = $totalSeconds + $seconds;
+                }
             } catch (ErrorException $e) {
                 continue;
             }
         }
 
-        $duration = DateTimeHelper::secondsToHumanTimeDuration($seconds, $showSeconds);
+        $duration = DateTimeHelper::secondsToHumanTimeDuration($totalSeconds, $showSeconds);
 
         return $duration;
     }
