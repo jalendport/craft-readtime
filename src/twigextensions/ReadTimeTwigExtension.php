@@ -32,6 +32,7 @@ class ReadTimeTwigExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('readTime', [$this, 'readTimeFunction']),
+			new \Twig_SimpleFunction('readTimeMin', [$this, 'readTimeMinFunction']),
         ];
     }
 
@@ -42,9 +43,9 @@ class ReadTimeTwigExtension extends \Twig_Extension
         ];
     }
 
-    public function readTimeFunction($element, $showSeconds = true)
-    {
-        $totalSeconds = 0;
+	private function calcReadTime($element)
+	{
+		$totalSeconds = 0;
         $vals = '';
 
         foreach ($element->getFieldLayout()->getFields() as $field) {
@@ -70,10 +71,23 @@ class ReadTimeTwigExtension extends \Twig_Extension
             }
         }
 
+		return $totalSeconds;
+	}
+
+    public function readTimeFunction($element, $showSeconds = true)
+    {
+        $totalSeconds = $this->calcReadTime($element);
+
         $duration = DateTimeHelper::secondsToHumanTimeDuration($totalSeconds, $showSeconds);
 
         return $duration;
     }
+
+	public function readTimeMinFunction($element)
+	{
+		$totalSeconds = $this->calcReadTime($element);
+		return round($totalSeconds / 60);
+	}
 
     public function readTimeFilter($value = null, $showSeconds = true)
     {
