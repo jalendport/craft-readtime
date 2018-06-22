@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.3.0 - 2018-06-22
+
+### Added
+- Format the time as a `DateInterval`
+- Output the total seconds, minutes and hours
+
+### Changed
+- Both the filter and function now return a `TimeModel`
+
 ## 1.2.1 - 2018-06-19
 
 ### Fixed
