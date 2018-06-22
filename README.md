@@ -36,9 +36,9 @@ The average user read speed is set at 200 words per minute by default, this can 
 
 ## Using the Filter
 
-The `|readTime` filter returns the human time duration of how long it takes the average user to read the provided content. The value provided can be a string or an array of values.
+The `|readTime` filter returns a [TimeModel](#timemodel) of how long it takes the average user to read the provided content. The value provided can be a string or an array of values.
 
-Seconds are included by default, but can be disabled by using `|readTime(false)`
+Seconds are included by default, but can be disabled by using `|readTime(false)` - this only affects the human time format.
 
 #### Examples
 
@@ -62,9 +62,9 @@ Returns: 3 minutes
 
 ## Using the Function
 
-The `readTime()` function returns the average read time for the whole entry based on it's field layout.
+The `readTime()` function returns a [TimeModel](#timemodel) for the whole entry based on it's field layout.
 
-Seconds are included by default, but can be disabled by adding a second parameter of `false`
+Seconds are included by default, but can be disabled by adding a second parameter of `false` - this only affects the human time format.
 
 #### Examples
 
