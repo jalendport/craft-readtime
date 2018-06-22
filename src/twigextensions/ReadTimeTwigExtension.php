@@ -11,6 +11,7 @@
 namespace lukeyouell\readtime\twigextensions;
 
 use lukeyouell\readtime\ReadTime;
+use lukeyouell\readtime\models\TimeModel;
 
 use Craft;
 use craft\helpers\DateTimeHelper;
@@ -70,17 +71,24 @@ class ReadTimeTwigExtension extends \Twig_Extension
             }
         }
 
-        $duration = DateTimeHelper::secondsToHumanTimeDuration($totalSeconds, $showSeconds);
+        $data = [
+            'seconds'     => $totalSeconds,
+            'showSeconds' => $showSeconds,
+        ];
 
-        return $duration;
+        return new TimeModel($data);
     }
 
     public function readTimeFilter($value = null, $showSeconds = true)
     {
         $seconds = $this->valToSeconds($value);
-        $duration = DateTimeHelper::secondsToHumanTimeDuration($seconds, $showSeconds);
 
-        return $duration;
+        $data = [
+            'seconds'     => $seconds,
+            'showSeconds' => $showSeconds,
+        ];
+
+        return new TimeModel($data);
     }
 
     // Private Methods
