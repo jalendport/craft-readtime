@@ -80,6 +80,48 @@ Returns: 9 minutes, 40 seconds
 Returns: 10 minutes
 ```
 
+## TimeModel
+
+Whenever you're dealing with the read time in your template, you're actually working with a TimeModel object.
+
+### Simple Output
+
+Outputting a TimeModel object without attaching a property or method will return the time in the form of a human time duration.
+
+```
+{{ string|readTime }}
+
+{{ readTime(entry) }}
+```
+
+### Properties
+
+#### `human`
+
+The human time duration.
+
+#### `interval(format)`
+
+A `DateInterval` object. You'll need to set the [format](http://php.net/manual/en/dateinterval.format.php) as a parameter:
+
+```twig
+{% set time = readTime(entry) %}
+
+{{ time.interval('%h hours, %i minutes, $s seconds') }}
+```
+
+#### `seconds`
+
+The total number of seconds.
+
+#### `minutes`
+
+The total number of minutes.
+
+#### `hours`
+
+The total number of hours.
+
 ## Overriding Plugin Settings
 
 If you create a [config file](https://docs.craftcms.com/v3/configuration.html) in your `config` folder called `read-time.php`, you can override the plugin’s settings in the Control Panel. Since that config file is fully [multi-environment](https://docs.craftcms.com/v3/configuration.html) aware, this is a handy way to have different settings across multiple environments.
