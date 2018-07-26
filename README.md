@@ -140,4 +140,6 @@ return [
 
 Some things to do, and ideas for potential features:
 
+- SuperTable integration
+
 Brought to you by [Luke Youell](https://github.com/lukeyouell)
