@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.4.0 - 2018-07-31
+
+### Added
+- Super Table support 🎉
+
 ## 1.3.0 - 2018-06-22
 
 ### Added
