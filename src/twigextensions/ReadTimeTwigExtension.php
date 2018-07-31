@@ -51,20 +51,42 @@ class ReadTimeTwigExtension extends \Twig_Extension
         foreach ($element->getFieldLayout()->getFields() as $field) {
             try {
                 // If field is a matrix then loop through fields in block
-                if ($field instanceof craft\fields\Matrix) {
+                if ($field instanceof \craft\fields\Matrix) {
                     foreach($element->getFieldValue($field->handle)->all() as $block) {
                         $blockFields = $block->getFieldLayout()->getFields();
 
-                        foreach($blockFields as $blockField){
+                        foreach ($blockFields as $blockField) {
                             $value = $block->getFieldValue($blockField->handle);
                             $seconds = $this->valToSeconds($value);
                             $totalSeconds = $totalSeconds + $seconds;
                         }
                     }
+                } elseif($field instanceof \verbb\supertable\fields\SuperTableField) {
+                    foreach($element->getFieldValue($field->handle)->all() as $block) {
+                        $blockFields = $block->getFieldLayout()->getFields();
+
+                        foreach ($blockFields as $blockField) {
+                            if ($blockField instanceof \craft\fields\Matrix) {
+                                foreach($block->getFieldValue($blockField->handle)->all() as $matrix) {
+                                    $matrixFields = $matrix->getFieldLayout()->getFields();
+
+                                    foreach ($matrixFields as $matrixField) {
+                                        $value = $matrix->getFieldValue($matrixField->handle);
+                                        $seconds = $this->valToSeconds($value);
+                                        $totalSeconds = $totalSeconds + $seconds;
+                                    }
+                                }
+                            } else {
+                                $value = $block->getFieldValue($blockField->handle);
+                                $seconds = $this->valToSeconds($value);
+                                $totalSeconds = $totalSeconds + $seconds;
+                            }
+                        }
+                    }
                 } else {
-                  $value = $element->getFieldValue($field->handle);
-                  $seconds = $this->valToSeconds($value);
-                  $totalSeconds = $totalSeconds + $seconds;
+                    $value = $element->getFieldValue($field->handle);
+                    $seconds = $this->valToSeconds($value);
+                    $totalSeconds = $totalSeconds + $seconds;
                 }
             } catch (ErrorException $e) {
                 continue;
