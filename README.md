@@ -62,22 +62,18 @@ Returns: 3 minutes
 
 ## Using the Function
 
-The `readTime()` function returns a [TimeModel](#timemodel) for the whole entry based on it's field layout.
+The `readTime()` function returns a [TimeModel](#timemodel) for matrix fields or the whole entry based on it's field layout.
 
 Seconds are included by default, but can be disabled by adding a second parameter of `false` - this only affects the human time format.
 
 #### Examples
 
 ```twig
-{{ readTime(entry) }}
-
-Returns: 9 minutes, 40 seconds
+{{ readTime(entry) }} or {{ readTime(entry.matrixField.all()) }}
 ```
 
 ```twig
-{{ readTime(entry, false) }}
-
-Returns: 10 minutes
+{{ readTime(entry, false) }} or {{ readTime(entry.matrixField.all(), false) }}
 ```
 
 ## TimeModel
@@ -92,6 +88,8 @@ Outputting a TimeModel object without attaching a property or method will return
 {{ string|readTime }}
 
 {{ readTime(entry) }}
+
+{{ readTime(entry.matrixField.all()) }}
 ```
 
 ### Properties
