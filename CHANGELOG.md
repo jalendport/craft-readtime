@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.5.0 - 2019-02-21
+
+### Added
+- Matrix field support
+
 ## 1.4.0 - 2018-07-31
 
 ### Added
