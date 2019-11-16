@@ -4,14 +4,14 @@
  *
  * Calculate the estimated read time for content.
  *
- * @link      https://github.com/lukeyouell
- * @copyright Copyright (c) 2018 Luke Youell
+ * @link      https://github.com/jalendport
+ * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-namespace lukeyouell\readtime\twigextensions;
+namespace jalendport\readtime\twigextensions;
 
-use lukeyouell\readtime\ReadTime;
-use lukeyouell\readtime\models\TimeModel;
+use jalendport\readtime\ReadTime;
+use jalendport\readtime\models\TimeModel;
 
 use Craft;
 use craft\helpers\DateTimeHelper;

@@ -4,13 +4,13 @@
  *
  * Calculate the estimated read time for content.
  *
- * @link      https://github.com/lukeyouell
- * @copyright Copyright (c) 2018 Luke Youell
+ * @link      https://github.com/jalendport
+ * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-namespace lukeyouell\readtime\models;
+namespace jalendport\readtime\models;
 
-use lukeyouell\readtime\ReadTime;
+use jalendport\readtime\ReadTime;
 
 use Craft;
 use craft\base\Model;
