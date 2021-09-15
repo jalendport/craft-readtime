@@ -54,7 +54,7 @@ class ReadTimeTwigExtension extends \Twig_Extension
             foreach ($element->getFieldLayout()->getFields() as $field) {
                 try {
                     // If field is a matrix then loop through fields in block
-                    if ($field instanceof \craft\fields\Matrix) {
+                    if ($field instanceof \craft\fields\Matrix || $field instanceof \benf\neo\Field) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
                             $blockFields = $block->getFieldLayout()->getFields();
 
@@ -96,11 +96,11 @@ class ReadTimeTwigExtension extends \Twig_Extension
                 }
             }
         } elseif(is_array($element)) {
-            // Provided value is a matrix field
-            Craft::info('matrix field provided', 'readtime');
+            // Provided value is a matrix or neo field
+            Craft::info('matrix or neo field provided', 'readtime');
 
             foreach ($element as $block) {
-                if ($block instanceof \craft\elements\MatrixBlock) {
+                if ($block instanceof \craft\elements\MatrixBlock || $block instanceof \benf\neo\elements\Block) {
                     $blockFields = $block->getFieldLayout()->getFields();
 
                     foreach ($blockFields as $blockField) {
