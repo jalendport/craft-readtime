@@ -30,7 +30,7 @@ class ReadTime extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     // Public Methods
     // =========================================================================
@@ -55,12 +55,12 @@ class ReadTime extends Plugin
     // Protected Methods
     // =========================================================================
 
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?\craft\base\Model
     {
         return new Settings();
     }
 
-    protected function settingsHtml(): string
+    protected function settingsHtml(): ?string
     {
         // Get and pre-validate the settings
         $settings = $this->getSettings();

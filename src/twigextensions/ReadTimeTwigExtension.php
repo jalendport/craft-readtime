@@ -19,7 +19,7 @@ use craft\helpers\StringHelper;
 
 use yii\base\ErrorException;
 
-class ReadTimeTwigExtension extends \Twig_Extension
+class ReadTimeTwigExtension extends \Twig\Extension\AbstractExtension
 {
     // Public Methods
     // =========================================================================
@@ -32,14 +32,14 @@ class ReadTimeTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('readTime', [$this, 'readTimeFunction']),
+            new \Twig\TwigFunction('readTime', [$this, 'readTimeFunction']),
         ];
     }
 
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('readTime', [$this, 'readTimeFilter']),
+            new \Twig\TwigFilter('readTime', [$this, 'readTimeFilter']),
         ];
     }
 
@@ -51,7 +51,7 @@ class ReadTimeTwigExtension extends \Twig_Extension
         if ($element instanceof \craft\elements\Entry) {
             // Provided value is an entry
 
-            foreach ($element->getFieldLayout()->getFields() as $field) {
+            foreach ($element->getFieldLayout()->getCustomFields() as $field) {
                 try {
                     // If field is a matrix then loop through fields in block
                     if ($field instanceof \craft\fields\Matrix) {
@@ -101,7 +101,7 @@ class ReadTimeTwigExtension extends \Twig_Extension
 
             foreach ($element as $block) {
                 if ($block instanceof \craft\elements\MatrixBlock) {
-                    $blockFields = $block->getFieldLayout()->getFields();
+                    $blockFields = $block->getFieldLayout()->getCustomFields();
 
                     foreach ($blockFields as $blockField) {
                         $value = $block->getFieldValue($blockField->handle);
