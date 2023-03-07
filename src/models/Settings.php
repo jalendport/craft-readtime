@@ -25,7 +25,7 @@ class Settings extends Model
     // Public Methods
     // =========================================================================
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['wordsPerMinute'], 'required'],
