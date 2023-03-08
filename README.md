@@ -8,7 +8,7 @@ Calculate the estimated read time for content.
 
 #### Requirements
 
-This plugin requires Craft CMS 3.0.0, or later.
+This plugin requires Craft CMS 4.0.0, or later.
 
 #### Plugin Store
 

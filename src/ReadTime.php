@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 4.x
  *
  * Calculate the estimated read time for content.
  *
@@ -10,27 +10,22 @@
 
 namespace jalendport\readtime;
 
+use Craft;
+use craft\base\Model;
+use craft\base\Plugin;
 use jalendport\readtime\models\Settings;
 use jalendport\readtime\twigextensions\ReadTimeTwigExtension;
-
-use Craft;
-use craft\base\Plugin;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
-
-use yii\base\Event;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\Exception;
 
 class ReadTime extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    public static $plugin;
-
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     // Public Methods
     // =========================================================================
@@ -38,7 +33,6 @@ class ReadTime extends Plugin
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
 
         Craft::$app->view->registerTwigExtension(new ReadTimeTwigExtension());
 
@@ -55,12 +49,18 @@ class ReadTime extends Plugin
     // Protected Methods
     // =========================================================================
 
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
 
-    protected function settingsHtml(): string
+	/**
+	 * @throws SyntaxError
+	 * @throws RuntimeError
+	 * @throws Exception
+	 * @throws LoaderError
+	 */
+	protected function settingsHtml(): ?string
     {
         // Get and pre-validate the settings
         $settings = $this->getSettings();

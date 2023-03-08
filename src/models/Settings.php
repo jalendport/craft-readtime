@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 4.x
  *
  * Calculate the estimated read time for content.
  *
@@ -10,9 +10,6 @@
 
 namespace jalendport\readtime\models;
 
-use jalendport\readtime\ReadTime;
-
-use Craft;
 use craft\base\Model;
 
 class Settings extends Model
@@ -20,12 +17,12 @@ class Settings extends Model
     // Public Properties
     // =========================================================================
 
-    public $wordsPerMinute = 200;
+    public int $wordsPerMinute = 200;
 
     // Public Methods
     // =========================================================================
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['wordsPerMinute'], 'required'],

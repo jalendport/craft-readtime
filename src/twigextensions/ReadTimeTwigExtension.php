@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 4.x
  *
  * Calculate the estimated read time for content.
  *
@@ -10,51 +10,59 @@
 
 namespace jalendport\readtime\twigextensions;
 
+use Craft;
+use craft\elements\Entry;
+use craft\elements\MatrixBlock;
+use craft\errors\InvalidFieldException;
+use craft\fields\Matrix;
+use craft\helpers\StringHelper;
+use jalendport\readtime\models\Settings;
 use jalendport\readtime\ReadTime;
 use jalendport\readtime\models\TimeModel;
-
-use Craft;
-use craft\helpers\DateTimeHelper;
-use craft\helpers\StringHelper;
-
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use verbb\supertable\fields\SuperTableField;
 use yii\base\ErrorException;
 
-class ReadTimeTwigExtension extends \Twig_Extension
+class ReadTimeTwigExtension extends AbstractExtension
 {
     // Public Methods
     // =========================================================================
 
-    public function getName()
-    {
+    public function getName(): string
+	{
         return 'readTime';
     }
 
-    public function getFunctions()
-    {
+    public function getFunctions(): array
+	{
         return [
-            new \Twig_SimpleFunction('readTime', [$this, 'readTimeFunction']),
+            new TwigFunction('readTime', [$this, 'readTimeFunction']),
         ];
     }
 
-    public function getFilters()
-    {
+    public function getFilters(): array
+	{
         return [
-            new \Twig_SimpleFilter('readTime', [$this, 'readTimeFilter']),
+            new TwigFilter('readTime', [$this, 'readTimeFilter']),
         ];
     }
 
-    public function readTimeFunction($element, $showSeconds = true)
-    {
+	/**
+	 * @throws InvalidFieldException
+	 */
+	public function readTimeFunction($element, $showSeconds = true): TimeModel
+	{
         $totalSeconds = 0;
-        $vals = '';
 
-        if ($element instanceof \craft\elements\Entry) {
+        if ($element instanceof Entry) {
             // Provided value is an entry
 
-            foreach ($element->getFieldLayout()->getFields() as $field) {
+            foreach ($element->getFieldLayout()->getCustomFields() as $field) {
                 try {
                     // If field is a matrix then loop through fields in block
-                    if ($field instanceof \craft\fields\Matrix) {
+                    if ($field instanceof Matrix) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
                             $blockFields = $block->getFieldLayout()->getFields();
 
@@ -64,12 +72,12 @@ class ReadTimeTwigExtension extends \Twig_Extension
                                 $totalSeconds = $totalSeconds + $seconds;
                             }
                         }
-                    } elseif($field instanceof \verbb\supertable\fields\SuperTableField) {
+                    } elseif($field instanceof SuperTableField) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
                             $blockFields = $block->getFieldLayout()->getFields();
 
                             foreach ($blockFields as $blockField) {
-                                if ($blockField instanceof \craft\fields\Matrix) {
+                                if ($blockField instanceof Matrix) {
                                     foreach($block->getFieldValue($blockField->handle)->all() as $matrix) {
                                         $matrixFields = $matrix->getFieldLayout()->getFields();
 
@@ -100,8 +108,8 @@ class ReadTimeTwigExtension extends \Twig_Extension
             Craft::info('matrix field provided', 'readtime');
 
             foreach ($element as $block) {
-                if ($block instanceof \craft\elements\MatrixBlock) {
-                    $blockFields = $block->getFieldLayout()->getFields();
+                if ($block instanceof MatrixBlock) {
+                    $blockFields = $block->getFieldLayout()->getCustomFields();
 
                     foreach ($blockFields as $blockField) {
                         $value = $block->getFieldValue($blockField->handle);
@@ -120,8 +128,8 @@ class ReadTimeTwigExtension extends \Twig_Extension
         return new TimeModel($data);
     }
 
-    public function readTimeFilter($value = null, $showSeconds = true)
-    {
+    public function readTimeFilter($value = null, $showSeconds = true): TimeModel
+	{
         $seconds = $this->valToSeconds($value);
 
         $data = [
@@ -135,9 +143,10 @@ class ReadTimeTwigExtension extends \Twig_Extension
     // Private Methods
     // =========================================================================
 
-    private function valToSeconds($value)
-    {
-        $settings = ReadTime::$plugin->getSettings();
+    private function valToSeconds($value): float
+	{
+		/** @var Settings $settings */
+        $settings = ReadTime::getInstance()->getSettings();
         $wpm = $settings->wordsPerMinute;
 
         $string = StringHelper::toString($value);
