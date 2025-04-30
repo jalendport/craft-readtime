@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 4.x
+ * Read Time plugin for Craft CMS 5.x
  *
  * Calculate the estimated read time for content.
  *

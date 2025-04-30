@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 4.x
+ * Read Time plugin for Craft CMS 5.x
  *
  * Calculate the estimated read time for content.
  *
@@ -66,7 +66,7 @@ class ReadTimeTwigExtension extends AbstractExtension
                     // If field is a matrix or neo then loop through fields in block
                     if ($field instanceof Matrix || $field instanceof NeoField) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
-                            $blockFields = $block->getFieldLayout()->getFields();
+                            $blockFields = $block->getFieldLayout()->getCustomFields();
 
                             foreach ($blockFields as $blockField) {
                                 $value = $block->getFieldValue($blockField->handle);
@@ -76,12 +76,12 @@ class ReadTimeTwigExtension extends AbstractExtension
                         }
                     } elseif($field instanceof SuperTableField) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
-                            $blockFields = $block->getFieldLayout()->getFields();
+                            $blockFields = $block->getFieldLayout()->getCustomFields();
 
                             foreach ($blockFields as $blockField) {
                                 if ($blockField instanceof Matrix || $blockFields instanceof NeoField) {
                                     foreach($block->getFieldValue($blockField->handle)->all() as $matrix) {
-                                        $matrixFields = $matrix->getFieldLayout()->getFields();
+                                        $matrixFields = $matrix->getFieldLayout()->getCustomFields();
 
                                         foreach ($matrixFields as $matrixField) {
                                             $value = $matrix->getFieldValue($matrixField->handle);
