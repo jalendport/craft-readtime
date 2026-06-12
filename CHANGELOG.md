@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0 - 2026-06-12
+
+> Stable Craft 4 release.
+
+### Fixed
+- Calling `readTime` on an entry containing Matrix or Super Table fields no longer throws a Twig error on Craft 4. The deprecated `FieldLayout::getFields()` calls in the nested Matrix, Super Table, and Matrix-in-Super-Table loops are now `getCustomFields()` ([#25](https://github.com/jalendport/craft-readtime/issues/25)).
+- Widened the exception handling in `readTimeFunction()` to also catch `craft\errors\InvalidFieldException` (thrown by `getFieldValue()`), which previously could surface as an uncaught Twig error.
+
 ## 2.0.0-beta.1 - 2023-03-07
 
 ### Added

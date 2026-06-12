@@ -49,9 +49,6 @@ class ReadTimeTwigExtension extends AbstractExtension
         ];
     }
 
-	/**
-	 * @throws InvalidFieldException
-	 */
 	public function readTimeFunction($element, $showSeconds = true): TimeModel
 	{
         $totalSeconds = 0;
@@ -64,7 +61,7 @@ class ReadTimeTwigExtension extends AbstractExtension
                     // If field is a matrix then loop through fields in block
                     if ($field instanceof Matrix) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
-                            $blockFields = $block->getFieldLayout()->getFields();
+                            $blockFields = $block->getFieldLayout()->getCustomFields();
 
                             foreach ($blockFields as $blockField) {
                                 $value = $block->getFieldValue($blockField->handle);
@@ -74,12 +71,12 @@ class ReadTimeTwigExtension extends AbstractExtension
                         }
                     } elseif($field instanceof SuperTableField) {
                         foreach($element->getFieldValue($field->handle)->all() as $block) {
-                            $blockFields = $block->getFieldLayout()->getFields();
+                            $blockFields = $block->getFieldLayout()->getCustomFields();
 
                             foreach ($blockFields as $blockField) {
                                 if ($blockField instanceof Matrix) {
                                     foreach($block->getFieldValue($blockField->handle)->all() as $matrix) {
-                                        $matrixFields = $matrix->getFieldLayout()->getFields();
+                                        $matrixFields = $matrix->getFieldLayout()->getCustomFields();
 
                                         foreach ($matrixFields as $matrixField) {
                                             $value = $matrix->getFieldValue($matrixField->handle);
@@ -99,7 +96,7 @@ class ReadTimeTwigExtension extends AbstractExtension
                         $seconds = $this->valToSeconds($value);
                         $totalSeconds = $totalSeconds + $seconds;
                     }
-                } catch (ErrorException $e) {
+                } catch (ErrorException | InvalidFieldException $e) {
                     continue;
                 }
             }
