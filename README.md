@@ -8,7 +8,7 @@ _Calculate the estimated read time for content._
 
 This plugin requires **Craft CMS 5.0.0 or later** and **PHP 8.2 or later**.
 
-> Using Craft 4? Use the [2.x](https://github.com/jalendport/craft-readtime/tree/develop) line, which is the Craft 4 release of this plugin.
+> Using Craft 4? Use the [2.x](https://github.com/jalendport/craft-readtime/tree/craft4) line, which is the Craft 4 release of this plugin.
 
 ### Plugin Store
 
