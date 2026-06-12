@@ -149,6 +149,16 @@ class ReadTimeTwigExtension extends AbstractExtension
         $wpm = $settings->wordsPerMinute;
 
         $string = StringHelper::toString($value);
+
+        // Rich-text fields such as Redactor stringify to raw HTML. Strip the
+        // markup before counting so tags and attributes aren't counted as
+        // words. Only strip when a complete tag is present, so plain-text
+        // values (which may legitimately contain a stray "<") are untouched.
+        // Tags are replaced with a space first so adjacent words don't merge.
+        if (preg_match('/<[^>]+>/', $string)) {
+            $string = strip_tags(preg_replace('/<[^>]+>/', ' ', $string));
+        }
+
         $wordCount = StringHelper::countWords($string);
         $seconds = floor($wordCount / $wpm * 60);
 

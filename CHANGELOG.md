@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.2.0 - 2026-06-12
+
+### Added
+- Redactor field support. `readTime` now counts content stored in [Redactor](https://github.com/craftcms/redactor) rich-text fields toward the calculated read time, both when a Redactor field sits directly on an entry and when it is nested inside Matrix, Neo, or Super Table blocks. Redactor stores its value as HTML, so the markup is now stripped before counting and the word count reflects the readable text rather than the tags. Redactor is treated as an optional, soft dependency — the plugin continues to load and compute read time on sites without Redactor installed.
+
 ## 2.1.0 - 2026-06-12
 
 ### Added
