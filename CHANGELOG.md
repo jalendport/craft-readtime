@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.0.0 - 2026-06-12
+
+> Craft 5 release. The 2.x line remains the Craft 4 line.
+
+### Added
+- Craft 5 support. This release requires Craft CMS 5.0.0+ and PHP 8.2+ ([#29](https://github.com/jalendport/craft-readtime/issues/29)).
+- [Vizy](https://verbb.io/craft-plugins/vizy) field support. Rich-text content is counted and Vizy blocks' nested fields are walked recursively.
+- [CKEditor](https://github.com/craftcms/ckeditor) field support. The editor's rich-text content is counted, plus the content of any entries embedded inside the field.
+- A `RegisterFieldHandlersEvent` so other plugins/modules can add read time support for further field types.
+- An example config file at `config/read-time.php`.
+
+### Changed
+- **Full rewrite.** The counting and field-walking logic now lives in a dedicated `jalendport\readtime\services\ReadTime` service, registered as a plugin component; the Twig extension is a thin wrapper that delegates to it. The nested `if/else` field walking has been replaced with a single recursive routine that dispatches each field to a small, per-field-type handler, so adding a new field type is a localised change.
+- Matrix content is now counted correctly on Craft 5. Matrix was "entrified" in Craft 5 — blocks are now `craft\elements\Entry` elements with their own field layouts — and their nested fields are walked accordingly. The previous code referenced the removed `craft\elements\MatrixBlock` class and silently miscounted entrified Matrix content.
+- Neo, Vizy, and CKEditor are treated as optional, soft dependencies — the plugin loads and computes read time on sites that don't have them installed.
+- Modernised to the current Craft 5 plugin spec and Yii guidelines: `declare(strict_types=1)`, typed properties and signatures, a `config()` method for component registration, and a settings config model.
+
+### Removed
+- **Super Table support.** Super Table does not exist for Craft 5, so it has been removed from the Craft 5 code path. Super Table support remains in the Craft 4 (2.x) line.
+- The committed `composer.lock` file (a plugin must not commit a lock file); it is now ignored.
+
 ## 2.1.0 - 2026-06-12
 
 ### Added

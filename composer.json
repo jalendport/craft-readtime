@@ -2,7 +2,7 @@
     "name": "jalendport/craft-readtime",
     "description": "Calculate the estimated read time for content.",
     "type": "craft-plugin",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "keywords": [
         "craft",
         "cms",
@@ -26,7 +26,13 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^4.0.0"
+        "php": "^8.2",
+        "craftcms/cms": "^5.0.0"
+    },
+    "suggest": {
+        "spicyweb/craft-neo": "Adds read time support for content stored in Neo fields.",
+        "verbb/vizy": "Adds read time support for content stored in Vizy fields.",
+        "craft/ckeditor": "Adds read time support for CKEditor fields, including nested entries."
     },
     "autoload": {
         "psr-4": {

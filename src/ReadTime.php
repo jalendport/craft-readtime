@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 4.x
+ * Read Time plugin for Craft CMS 5.x
  *
  * Calculate the estimated read time for content.
  *
@@ -8,29 +8,44 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
+declare(strict_types=1);
+
 namespace jalendport\readtime;
 
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
 use jalendport\readtime\models\Settings;
+use jalendport\readtime\services\ReadTime as ReadTimeService;
 use jalendport\readtime\twigextensions\ReadTimeTwigExtension;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use yii\base\Exception;
 
+/**
+ * @property-read ReadTimeService $readTime
+ * @method Settings getSettings()
+ */
 class ReadTime extends Plugin
 {
-    // Public Properties
-    // =========================================================================
-
     public string $schemaVersion = '1.0.0';
 
-    // Public Methods
-    // =========================================================================
+    public bool $hasCpSettings = true;
 
-    public function init()
+    /**
+     * Registers the plugin's components per the Craft 5 plugin spec.
+     */
+    public static function config(): array
+    {
+        return [
+            'components' => [
+                'readTime' => ReadTimeService::class,
+            ],
+        ];
+    }
+
+    public function init(): void
     {
         parent::init();
 
@@ -46,21 +61,26 @@ class ReadTime extends Plugin
         );
     }
 
-    // Protected Methods
-    // =========================================================================
+    /**
+     * Returns the read time service.
+     */
+    public function getReadTime(): ReadTimeService
+    {
+        return $this->get('readTime');
+    }
 
     protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
 
-	/**
-	 * @throws SyntaxError
-	 * @throws RuntimeError
-	 * @throws Exception
-	 * @throws LoaderError
-	 */
-	protected function settingsHtml(): ?string
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws Exception
+     * @throws LoaderError
+     */
+    protected function settingsHtml(): ?string
     {
         // Get and pre-validate the settings
         $settings = $this->getSettings();
@@ -73,7 +93,7 @@ class ReadTime extends Plugin
             'read-time/settings',
             [
                 'settings' => $settings,
-                'overrides' => array_keys($overrides)
+                'overrides' => array_keys($overrides),
             ]
         );
     }

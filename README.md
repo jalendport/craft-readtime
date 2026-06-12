@@ -6,7 +6,9 @@ _Calculate the estimated read time for content._
 
 ### Requirements
 
-This plugin requires Craft CMS 4.0.0 or later.
+This plugin requires **Craft CMS 5.0.0 or later** and **PHP 8.2 or later**.
+
+> Using Craft 4? Use the [2.x](https://github.com/jalendport/craft-readtime/tree/develop) line, which is the Craft 4 release of this plugin.
 
 ### Plugin Store
 
@@ -49,7 +51,7 @@ Seconds are included by default, but can be disabled by using `|readTime(false)`
 
 ### Using the Function
 
-The `readTime()` function returns a [TimeModel](#timemodel) for Matrix fields or the whole entry based on its field layout.
+The `readTime()` function returns a [TimeModel](#timemodel) for the whole entry (based on its field layout) or for a block field passed directly.
 
 Seconds are included by default, but can be disabled by passing `false` as a second parameter — this only affects the human time format.
 
@@ -60,6 +62,22 @@ Seconds are included by default, but can be disabled by passing `false` as a sec
 {{ readTime(entry, false) }}
 {{ readTime(entry.matrixField.all(), false) }}
 ```
+
+### Supported Field Types
+
+When you pass an entry to `readTime()`, the plugin walks its field layout and counts the content of each field, recursing into nested-block fields:
+
+| Field type | Notes |
+| --- | --- |
+| Plain text / rich text (e.g. Redactor, Plain Text) | Counted directly. |
+| **Matrix** (native) | On Craft 5, Matrix blocks are entrified — each block is an `Entry` element. Their nested fields are walked recursively. |
+| **Neo** ([`spicyweb/craft-neo`](https://github.com/spicywebau/craft-neo)) | Each Neo block's fields are walked recursively. |
+| **Vizy** ([`verbb/vizy`](https://verbb.io/craft-plugins/vizy)) | Rich-text content is counted and Vizy blocks' nested fields are walked recursively. |
+| **CKEditor** ([`craft/ckeditor`](https://github.com/craftcms/ckeditor)) | The editor's rich-text content is counted, plus the content of any entries embedded inside the field. |
+
+Neo, Vizy, and CKEditor are treated as optional, soft dependencies — the plugin loads and computes read time fine on sites that don't have them installed.
+
+> **Super Table is no longer supported.** It does not exist for Craft 5, so it has been removed from the Craft 5 code path. Super Table support remains in the Craft 4 (2.x) line.
 
 ### TimeModel
 
@@ -92,7 +110,7 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 
 The average user read speed is set at 200 words per minute by default. This can be changed in the plugin settings, or overridden with a config file.
 
-If you create a [config file](https://craftcms.com/docs/4.x/config/) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/4.x/config/#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments.
+If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. An example is included at [`config/read-time.php`](config/read-time.php).
 
 ```php
 <?php
