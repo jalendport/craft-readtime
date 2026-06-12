@@ -1,6 +1,6 @@
 <?php
 /**
- * Read Time plugin for Craft CMS 3.x
+ * Read Time plugin for Craft CMS 4.x
  *
  * Calculate the estimated read time for content.
  *
@@ -10,36 +10,37 @@
 
 namespace jalendport\readtime\models;
 
-use jalendport\readtime\ReadTime;
-
-use Craft;
 use craft\base\Model;
 use craft\helpers\DateTimeHelper;
+use Exception;
 
 class TimeModel extends Model
 {
     // Public Properties
     // =========================================================================
 
-    public $seconds = 0;
+    public int $seconds = 0;
 
-    public $showSeconds = true;
+    public bool $showSeconds = true;
 
     // Public Methods
     // =========================================================================
 
     public function __toString()
     {
-        return (string) $this->human();
+        return $this->human();
     }
 
-    public function human()
-    {
-        return DateTimeHelper::secondsToHumanTimeDuration($this->seconds, $this->showSeconds);
+    public function human(): string
+	{
+        return DateTimeHelper::humanDuration($this->seconds, $this->showSeconds);
     }
 
-    public function interval($format = '%h hours, %i minutes, %s seconds')
-    {
+	/**
+	 * @throws Exception
+	 */
+	public function interval($format = '%h hours, %i minutes, %s seconds'): string
+	{
         $currentTimeStamp = DateTimeHelper::currentTimeStamp();
         $datetimeStart = DateTimeHelper::toDateTime($currentTimeStamp);
         $datetimeEnd = DateTimeHelper::toDateTime(DateTimeHelper::currentTimeStamp() + $this->seconds);
@@ -49,18 +50,18 @@ class TimeModel extends Model
         return $interval->format($format);
     }
 
-    public function seconds()
-    {
+    public function seconds(): int
+	{
         return $this->seconds;
     }
 
-    public function minutes()
-    {
+    public function minutes(): float
+	{
         return floor($this->seconds / 60);
     }
 
-    public function hours()
-    {
+    public function hours(): float
+	{
         return floor(($this->seconds /  60) / 60);
     }
 }
