@@ -135,7 +135,34 @@ class ReadTime extends Plugin
             [
                 'settings' => $settings,
                 'overrides' => array_keys($overrides),
+                'outputLocaleOptions' => $this->outputLocaleOptions(),
             ]
         );
+    }
+
+    /**
+     * Builds the option list for the "Output Locale" dropdown: a blank
+     * "Current language" entry, the "Content's site language" keyword, then one
+     * option per configured site language. A power user can still pin an
+     * off-list locale via `config/read-time.php`; the model validates against
+     * Craft's full known-locale list.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    private function outputLocaleOptions(): array
+    {
+        $options = [
+            ['label' => Craft::t('read-time', 'Current language'), 'value' => ''],
+            ['label' => Craft::t('read-time', 'Content’s site language'), 'value' => Settings::OUTPUT_LOCALE_SITE],
+        ];
+
+        foreach (Craft::$app->getI18n()->getSiteLocales() as $locale) {
+            $options[] = [
+                'label' => $locale->getDisplayName(Craft::$app->language) . ' (' . $locale->id . ')',
+                'value' => $locale->id,
+            ];
+        }
+
+        return $options;
     }
 }
