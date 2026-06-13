@@ -299,7 +299,16 @@ class ReadTime extends Component
         return (int)floor($words / $this->getWordsPerMinute() * 60);
     }
 
-    private function getWordsPerMinute(): int
+    /**
+     * Returns the configured reading speed, in words per minute, falling back to
+     * 200 when the setting is missing or non-positive.
+     *
+     * `protected` rather than `private` so the words-per-minute lookup — the one
+     * piece of {@see wordsToSeconds()} that reaches the plugin singleton (and a
+     * booted Craft app) — can be overridden in unit tests, keeping the
+     * surrounding arithmetic testable without an application.
+     */
+    protected function getWordsPerMinute(): int
     {
         $wpm = ReadTimePlugin::getInstance()->getSettings()->wordsPerMinute;
 
