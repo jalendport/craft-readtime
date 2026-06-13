@@ -15,12 +15,19 @@ namespace jalendport\readtime;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
+use craft\events\DefineGqlTypeFieldsEvent;
+use craft\events\RegisterGqlTypesEvent;
+use craft\gql\interfaces\elements\Entry as EntryInterface;
+use craft\gql\TypeManager;
+use craft\services\Gql;
+use jalendport\readtime\gql\types\ReadTimeType;
 use jalendport\readtime\models\Settings;
 use jalendport\readtime\services\ReadTime as ReadTimeService;
 use jalendport\readtime\twigextensions\ReadTimeTwigExtension;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use yii\base\Event;
 use yii\base\Exception;
 
 /**
@@ -51,6 +58,8 @@ class ReadTime extends Plugin
 
         Craft::$app->view->registerTwigExtension(new ReadTimeTwigExtension());
 
+        $this->registerGqlSupport();
+
         Craft::info(
             Craft::t(
                 'read-time',
@@ -67,6 +76,38 @@ class ReadTime extends Plugin
     public function getReadTime(): ReadTimeService
     {
         return $this->get('readTime');
+    }
+
+    /**
+     * Registers the `ReadTime` GraphQL type and adds a `readTime` field to entry
+     * types, resolving from the read time service so GraphQL and Twig stay in
+     * sync. Read time is computed on demand in the resolver, so entries that
+     * don't request the field pay no cost.
+     */
+    private function registerGqlSupport(): void
+    {
+        // Register the `ReadTime` object type with the schema.
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_TYPES,
+            static function(RegisterGqlTypesEvent $event): void {
+                $event->types[] = ReadTimeType::class;
+            }
+        );
+
+        // Add the `readTime` field to the entry interface, which propagates to
+        // every concrete entry type.
+        Event::on(
+            TypeManager::class,
+            TypeManager::EVENT_DEFINE_GQL_TYPE_FIELDS,
+            static function(DefineGqlTypeFieldsEvent $event): void {
+                if ($event->typeName !== EntryInterface::getName()) {
+                    return;
+                }
+
+                $event->fields['readTime'] = ReadTimeType::getEntryFieldDefinition();
+            }
+        );
     }
 
     protected function createSettingsModel(): ?Model
@@ -94,7 +135,34 @@ class ReadTime extends Plugin
             [
                 'settings' => $settings,
                 'overrides' => array_keys($overrides),
+                'outputLocaleOptions' => $this->outputLocaleOptions(),
             ]
         );
+    }
+
+    /**
+     * Builds the option list for the "Output Locale" dropdown: a blank
+     * "Current language" entry, the "Content's site language" keyword, then one
+     * option per configured site language. A power user can still pin an
+     * off-list locale via `config/read-time.php`; the model validates against
+     * Craft's full known-locale list.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    private function outputLocaleOptions(): array
+    {
+        $options = [
+            ['label' => Craft::t('read-time', 'Current language'), 'value' => ''],
+            ['label' => Craft::t('read-time', 'Content’s site language'), 'value' => Settings::OUTPUT_LOCALE_SITE],
+        ];
+
+        foreach (Craft::$app->getI18n()->getSiteLocales() as $locale) {
+            $options[] = [
+                'label' => $locale->getDisplayName(Craft::$app->language) . ' (' . $locale->id . ')',
+                'value' => $locale->id,
+            ];
+        }
+
+        return $options;
     }
 }
