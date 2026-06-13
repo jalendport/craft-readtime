@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+- HTML markup is now stripped before content is word-counted, so read-time estimates are no longer inflated by tag names, attribute names, and attribute values such as URLs ([#14](https://github.com/jalendport/craft-readtime/issues/14)). The fix is applied centrally in the word counter, so both the `readTime` filter (raw strings) and `readTime()` (field-walking over rich-text fields like CKEditor) are corrected. Tags are replaced with whitespace (not removed) so words across tag boundaries stay separate, and HTML entities are decoded so `&nbsp;` counts as whitespace and `&amp;` isn't counted as a word. Plain (non-HTML) text counts are unchanged.
+
 ## 3.0.0 - 2026-06-12
 
 > Craft 5 release. The 2.x line remains the Craft 4 line.

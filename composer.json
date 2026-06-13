@@ -29,6 +29,9 @@
         "php": "^8.2",
         "craftcms/cms": "^5.0.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
     "suggest": {
         "spicyweb/craft-neo": "Adds read time support for content stored in Neo fields.",
         "verbb/vizy": "Adds read time support for content stored in Vizy fields.",
@@ -38,6 +41,14 @@
         "psr-4": {
           "jalendport\\readtime\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+          "jalendport\\readtime\\tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "extra": {
         "name": "Read Time",
