@@ -111,13 +111,30 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 | Setting | Default | Description |
 | --- | --- | --- |
 | `wordsPerMinute` | `200` | The average reading speed, in words per minute, used to calculate the read time. |
+| `outputLocale` | _(empty)_ | The language used for the human-readable string. Empty follows the current application language; `site` formats each element in its own site's language; a locale ID (e.g. `de-DE`) forces one language everywhere. See [Output Locale](#output-locale) below. Only the human-readable string is affected. |
 | `minimumReadTime` | `0` | Minimum read time, in whole minutes. When greater than `0`, read times are rounded **up** to at least this many minutes, so sub-minute (and empty) content displays as e.g. "1 minute" instead of "less than a minute". `0` keeps the default behaviour. |
 
 The minimum is applied at the source, so it is reflected consistently everywhere — `time.human`, `time.seconds`, `time.minutes`, `time.hours`, the `readTime()` function, and the `|readTime` filter all agree, as does any other consumer of the returned `TimeModel`.
 
+### Output Locale
+
+By default the human-readable string follows the **current application language**, which depends on context: a logged-in user's preferred language in the Control Panel, the requested site's language on the front end, and the system/default language in console commands (e.g. `php craft resave/entries`). That means content pre-parsed into a custom field can end up in a different language depending on where it was saved.
+
+The `outputLocale` setting lets you pin the language of the human-readable string so it stays consistent. It is a single setting with three modes:
+
+| Value | Behaviour |
+| --- | --- |
+| _(empty)_ / `null` | **Current language** (default). The output follows the active application language — the existing behaviour, unchanged. |
+| `site` | **Content's site language.** The output is formatted in the language of the site the content belongs to. Recommended for multi-site installs: each site's content formats in its own language, including under `resave/entries`. On the `|readTime` filter (which has no element), this falls back to the current site's language. |
+| a locale ID, e.g. `de-DE` | **Force that locale everywhere.** Useful for single-site installs, or anyone who wants uniform output across all sites. |
+
+This affects **only** the human-readable string (`time` / `time.human`, and the GraphQL human-readable field). Numeric values (`time.seconds`, `time.minutes`, `time.hours`) are locale-independent and never change.
+
+In the Control Panel the dropdown lists _Current language_, _Content's site language_, and your configured site languages. Via the config file you can also set any locale ID Craft recognises, even if it isn't one of your site languages.
+
 ### Overriding Plugin Settings
 
-Both settings can be changed in the plugin settings in the Control Panel, or overridden with a config file.
+These settings can be changed in the plugin settings in the Control Panel, or overridden with a config file.
 
 If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. An example is included at [`config/read-time.php`](config/read-time.php).
 
@@ -126,6 +143,7 @@ If you create a [config file](https://craftcms.com/docs/5.x/configure.html#confi
 
 return [
     'wordsPerMinute' => 200,
+    'outputLocale' => null, // null | 'site' | a locale ID such as 'de-DE'
     'minimumReadTime' => 0,
 ];
 ```

@@ -24,6 +24,7 @@ use jalendport\readtime\fieldhandlers\CkeditorHandler;
 use jalendport\readtime\fieldhandlers\MatrixHandler;
 use jalendport\readtime\fieldhandlers\NeoHandler;
 use jalendport\readtime\fieldhandlers\VizyHandler;
+use jalendport\readtime\models\Settings;
 use jalendport\readtime\models\TimeModel;
 use jalendport\readtime\ReadTime as ReadTimePlugin;
 use Throwable;
@@ -64,7 +65,11 @@ class ReadTime extends Component
      */
     public function calculateForElement(mixed $element, bool $showSeconds = true): TimeModel
     {
-        return $this->makeTimeModel($this->secondsForValue($element), $showSeconds);
+        // Resolve the output-locale mode against the element when we have one,
+        // so 'site' mode picks up that element's site language.
+        $context = $element instanceof ElementInterface ? $element : null;
+
+        return $this->makeTimeModel($this->secondsForValue($element), $showSeconds, $context);
     }
 
     /**
@@ -73,7 +78,9 @@ class ReadTime extends Component
      */
     public function calculateForValue(mixed $value, bool $showSeconds = true): TimeModel
     {
-        return $this->makeTimeModel($this->secondsForString($value), $showSeconds);
+        // The filter path has no element; 'site' mode falls back to the current
+        // site's language inside resolveOutputLocale().
+        return $this->makeTimeModel($this->secondsForString($value), $showSeconds, null);
     }
 
     /**
@@ -159,12 +166,12 @@ class ReadTime extends Component
 
     /**
      * Builds a {@see TimeModel} from a raw second count, applying the configured
-     * minimum read time. This is the single place the floor is enforced, so every
-     * output path — `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`,
-     * the Twig function and filter, and every other consumer of the returned
-     * `TimeModel` — agrees.
+     * minimum read time and resolving the output locale. This is the single place
+     * the floor is enforced, so every output path — `human()`, `__toString()`,
+     * `seconds()`/`minutes()`/`hours()`, the Twig function and filter, and every
+     * other consumer of the returned `TimeModel` — agrees.
      */
-    private function makeTimeModel(int $seconds, bool $showSeconds): TimeModel
+    private function makeTimeModel(int $seconds, bool $showSeconds, ?ElementInterface $context = null): TimeModel
     {
         $minimum = $this->getMinimumReadTime();
 
@@ -175,6 +182,7 @@ class ReadTime extends Component
         return new TimeModel([
             'seconds' => $seconds,
             'showSeconds' => $showSeconds,
+            'outputLocale' => $this->resolveOutputLocale($context),
         ]);
     }
 
@@ -183,6 +191,36 @@ class ReadTime extends Component
         $minimum = ReadTimePlugin::getInstance()->getSettings()->minimumReadTime;
 
         return $minimum > 0 ? $minimum : 0;
+    }
+
+    /**
+     * Resolves the configured `outputLocale` mode to a concrete locale ID (or
+     * `null`) for the model. Keeping this in the service means {@see TimeModel}
+     * never sees the `'site'` keyword, the settings, or the element.
+     *
+     * - empty/null → `null` (the model follows the current application language).
+     * - `'site'` → the element's site language, or — on the element-less filter
+     *   path — the current site's language (preserving the "a site's language"
+     *   semantic rather than falling back to the CP user's language).
+     * - a specific locale ID → that locale, verbatim.
+     */
+    private function resolveOutputLocale(?ElementInterface $element): ?string
+    {
+        $mode = ReadTimePlugin::getInstance()->getSettings()->outputLocale;
+
+        if ($mode === null || $mode === '') {
+            return null;
+        }
+
+        if ($mode === Settings::OUTPUT_LOCALE_SITE) {
+            if ($element !== null) {
+                return $element->getSite()->language;
+            }
+
+            return Craft::$app->getSites()->getCurrentSite()->language;
+        }
+
+        return $mode;
     }
 
     private function secondsForValue(mixed $element): int

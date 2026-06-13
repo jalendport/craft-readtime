@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 
 ### Added
+- An `outputLocale` setting to control the language of the human-readable read-time string ([#20](https://github.com/jalendport/craft-readtime/issues/20)). Leave it empty to follow the current application language (unchanged default), set it to `site` to format each element in its own site's language (consistent across CP, front-end, and `resave/entries` on multi-site installs), or set a specific locale ID (e.g. `de-DE`) to force one language everywhere. Configurable in the plugin settings or via `config/read-time.php`. Only the human-readable string is affected; numeric values are unchanged.
 - A `minimumReadTime` setting (in whole minutes). When greater than `0`, read times are rounded up to at least this many minutes, so sub-minute and empty content displays as e.g. "1 minute" instead of "less than a minute". Defaults to `0`, which preserves the existing behaviour. The floor is applied once when the service builds the `TimeModel`, so it is reflected consistently across `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`, the Twig function, and the Twig filter — and any other consumer of the returned `TimeModel`. Can be set in `config/read-time.php` ([#26](https://github.com/jalendport/craft-readtime/issues/26)).
 
 ### Fixed
