@@ -44,12 +44,20 @@ class Settings extends Model
      */
     public ?string $outputLocale = null;
 
+    /**
+     * @var int Minimum read time, in whole minutes. When greater than 0, read
+     * times are rounded up to at least this many minutes. 0 (the default)
+     * preserves Craft's "less than a minute" output for sub-minute content.
+     */
+    public int $minimumReadTime = 0;
+
     public function rules(): array
     {
         return [
             [['wordsPerMinute'], 'required'],
             [['wordsPerMinute'], 'number', 'integerOnly' => true],
             [['outputLocale'], 'validateOutputLocale'],
+            [['minimumReadTime'], 'number', 'integerOnly' => true, 'min' => 0],
         ];
     }
 

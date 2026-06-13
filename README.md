@@ -106,6 +106,16 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 {{ time.interval('%h hours, %i minutes, %s seconds') }}  {# 0 hours, 2 minutes, 40 seconds #}
 ```
 
+### Settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `wordsPerMinute` | `200` | The average reading speed, in words per minute, used to calculate the read time. |
+| `outputLocale` | _(empty)_ | The language used for the human-readable string. Empty follows the current application language; `site` formats each element in its own site's language; a locale ID (e.g. `de-DE`) forces one language everywhere. See [Output Locale](#output-locale) below. Only the human-readable string is affected. |
+| `minimumReadTime` | `0` | Minimum read time, in whole minutes. When greater than `0`, read times are rounded **up** to at least this many minutes, so sub-minute (and empty) content displays as e.g. "1 minute" instead of "less than a minute". `0` keeps the default behaviour. |
+
+The minimum is applied at the source, so it is reflected consistently everywhere — `time.human`, `time.seconds`, `time.minutes`, `time.hours`, the `readTime()` function, and the `|readTime` filter all agree, as does any other consumer of the returned `TimeModel`.
+
 ### Output Locale
 
 By default the human-readable string follows the **current application language**, which depends on context: a logged-in user's preferred language in the Control Panel, the requested site's language on the front end, and the system/default language in console commands (e.g. `php craft resave/entries`). That means content pre-parsed into a custom field can end up in a different language depending on where it was saved.
@@ -124,7 +134,7 @@ In the Control Panel the dropdown lists _Current language_, _Content's site lang
 
 ### Overriding Plugin Settings
 
-The settings above can be changed in the plugin settings in the Control Panel, or overridden with a config file.
+These settings can be changed in the plugin settings in the Control Panel, or overridden with a config file.
 
 If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. An example is included at [`config/read-time.php`](config/read-time.php).
 
@@ -134,6 +144,7 @@ If you create a [config file](https://craftcms.com/docs/5.x/configure.html#confi
 return [
     'wordsPerMinute' => 200,
     'outputLocale' => null, // null | 'site' | a locale ID such as 'de-DE'
+    'minimumReadTime' => 0,
 ];
 ```
 

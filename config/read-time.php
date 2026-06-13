@@ -19,4 +19,10 @@ return [
     // ID (e.g. 'de-DE') to force one language everywhere. Only the
     // human-readable string is affected; numeric values are not.
     'outputLocale' => null,
+
+    // Minimum read time, in whole minutes. When greater than 0, read times are
+    // rounded up to at least this many minutes, so sub-minute content displays
+    // as e.g. "1 minute" instead of "less than a minute". 0 keeps the default
+    // behaviour.
+    'minimumReadTime' => 0,
 ];
