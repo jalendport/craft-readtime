@@ -64,10 +64,7 @@ class ReadTime extends Component
      */
     public function calculateForElement(mixed $element, bool $showSeconds = true): TimeModel
     {
-        return new TimeModel([
-            'seconds' => $this->secondsForValue($element),
-            'showSeconds' => $showSeconds,
-        ]);
+        return $this->makeTimeModel($this->secondsForValue($element), $showSeconds);
     }
 
     /**
@@ -76,10 +73,7 @@ class ReadTime extends Component
      */
     public function calculateForValue(mixed $value, bool $showSeconds = true): TimeModel
     {
-        return new TimeModel([
-            'seconds' => $this->secondsForString($value),
-            'showSeconds' => $showSeconds,
-        ]);
+        return $this->makeTimeModel($this->secondsForString($value), $showSeconds);
     }
 
     /**
@@ -162,6 +156,34 @@ class ReadTime extends Component
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * Builds a {@see TimeModel} from a raw second count, applying the configured
+     * minimum read time. This is the single place the floor is enforced, so every
+     * output path — `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`,
+     * the Twig function and filter, and every other consumer of the returned
+     * `TimeModel` — agrees.
+     */
+    private function makeTimeModel(int $seconds, bool $showSeconds): TimeModel
+    {
+        $minimum = $this->getMinimumReadTime();
+
+        if ($minimum > 0) {
+            $seconds = max($seconds, $minimum * 60);
+        }
+
+        return new TimeModel([
+            'seconds' => $seconds,
+            'showSeconds' => $showSeconds,
+        ]);
+    }
+
+    private function getMinimumReadTime(): int
+    {
+        $minimum = ReadTimePlugin::getInstance()->getSettings()->minimumReadTime;
+
+        return $minimum > 0 ? $minimum : 0;
+    }
 
     private function secondsForValue(mixed $element): int
     {
