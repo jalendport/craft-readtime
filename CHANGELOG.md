@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Unreleased
 
+### Added
+- A `minimumReadTime` setting (in whole minutes). When greater than `0`, read times are rounded up to at least this many minutes, so sub-minute and empty content displays as e.g. "1 minute" instead of "less than a minute". Defaults to `0`, which preserves the existing behaviour. The floor is applied once when the service builds the `TimeModel`, so it is reflected consistently across `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`, the Twig function, and the Twig filter — and any other consumer of the returned `TimeModel`. Can be set in `config/read-time.php` ([#26](https://github.com/jalendport/craft-readtime/issues/26)).
+
 ### Fixed
 - HTML markup is now stripped before content is word-counted, so read-time estimates are no longer inflated by tag names, attribute names, and attribute values such as URLs ([#14](https://github.com/jalendport/craft-readtime/issues/14)). The fix is applied centrally in the word counter, so both the `readTime` filter (raw strings) and `readTime()` (field-walking over rich-text fields like CKEditor) are corrected. Tags are replaced with whitespace (not removed) so words across tag boundaries stay separate, and HTML entities are decoded so `&nbsp;` counts as whitespace and `&amp;` isn't counted as a word. Plain (non-HTML) text counts are unchanged.
+- The settings template referenced the wrong config filename (`reading-time.php`) and translation category (`reading-time`); both are now `read-time`, so the config-override warning points at the correct file.
 
 ## 3.0.0 - 2026-06-12
 
