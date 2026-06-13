@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 3.1.0 - 2026-06-12
 
 ### Added
 - GraphQL support. A `readTime` field is now available on entry types in the GraphQL schema, returning a `ReadTime` object type with `seconds`, `minutes`, `hours`, and `humanReadable`. The resolver delegates to the existing read time service, so GraphQL and Twig report the same read time for a given entry, including content stored in Matrix, Neo, Vizy, and CKEditor fields. An optional `showSeconds` argument controls the `humanReadable` output ([#28](https://github.com/jalendport/craft-readtime/issues/28)).
