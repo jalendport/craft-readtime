@@ -113,7 +113,7 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 | `wordsPerMinute` | `200` | The average reading speed, in words per minute, used to calculate the read time. |
 | `minimumReadTime` | `0` | Minimum read time, in whole minutes. When greater than `0`, read times are rounded **up** to at least this many minutes, so sub-minute (and empty) content displays as e.g. "1 minute" instead of "less than a minute". `0` keeps the default behaviour. |
 
-The minimum is applied at the source, so it is reflected consistently everywhere — `time.human`, `time.seconds`, `time.minutes`, `time.hours`, the `readTime()` function, the `|readTime` filter, and the GraphQL `readTime` field all agree.
+The minimum is applied at the source, so it is reflected consistently everywhere — `time.human`, `time.seconds`, `time.minutes`, `time.hours`, the `readTime()` function, and the `|readTime` filter all agree, as does any other consumer of the returned `TimeModel`.
 
 ### Overriding Plugin Settings
 

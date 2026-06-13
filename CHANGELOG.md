@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 
 ### Added
-- A `minimumReadTime` setting (in whole minutes). When greater than `0`, read times are rounded up to at least this many minutes, so sub-minute and empty content displays as e.g. "1 minute" instead of "less than a minute". Defaults to `0`, which preserves the existing behaviour. The floor is applied once when the service builds the `TimeModel`, so it is reflected consistently across `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`, the Twig function and filter, and the GraphQL `readTime` field. Can be set in `config/read-time.php` ([#26](https://github.com/jalendport/craft-readtime/issues/26)).
+- A `minimumReadTime` setting (in whole minutes). When greater than `0`, read times are rounded up to at least this many minutes, so sub-minute and empty content displays as e.g. "1 minute" instead of "less than a minute". Defaults to `0`, which preserves the existing behaviour. The floor is applied once when the service builds the `TimeModel`, so it is reflected consistently across `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`, the Twig function, and the Twig filter — and any other consumer of the returned `TimeModel`. Can be set in `config/read-time.php` ([#26](https://github.com/jalendport/craft-readtime/issues/26)).
 
 ### Fixed
 - The settings template referenced the wrong config filename (`reading-time.php`) and translation category (`reading-time`); both are now `read-time`, so the config-override warning points at the correct file.

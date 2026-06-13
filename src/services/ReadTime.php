@@ -161,7 +161,8 @@ class ReadTime extends Component
      * Builds a {@see TimeModel} from a raw second count, applying the configured
      * minimum read time. This is the single place the floor is enforced, so every
      * output path — `human()`, `__toString()`, `seconds()`/`minutes()`/`hours()`,
-     * the Twig function and filter, and the GraphQL `readTime` field — agrees.
+     * the Twig function and filter, and every other consumer of the returned
+     * `TimeModel` — agrees.
      */
     private function makeTimeModel(int $seconds, bool $showSeconds): TimeModel
     {
