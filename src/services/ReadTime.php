@@ -24,6 +24,7 @@ use jalendport\readtime\fieldhandlers\CkeditorHandler;
 use jalendport\readtime\fieldhandlers\MatrixHandler;
 use jalendport\readtime\fieldhandlers\NeoHandler;
 use jalendport\readtime\fieldhandlers\VizyHandler;
+use jalendport\readtime\models\Settings;
 use jalendport\readtime\models\TimeModel;
 use jalendport\readtime\ReadTime as ReadTimePlugin;
 use Throwable;
@@ -64,9 +65,14 @@ class ReadTime extends Component
      */
     public function calculateForElement(mixed $element, bool $showSeconds = true): TimeModel
     {
+        // Resolve the output-locale mode against the element when we have one,
+        // so 'site' mode picks up that element's site language.
+        $context = $element instanceof ElementInterface ? $element : null;
+
         return new TimeModel([
             'seconds' => $this->secondsForValue($element),
             'showSeconds' => $showSeconds,
+            'outputLocale' => $this->resolveOutputLocale($context),
         ]);
     }
 
@@ -76,9 +82,12 @@ class ReadTime extends Component
      */
     public function calculateForValue(mixed $value, bool $showSeconds = true): TimeModel
     {
+        // The filter path has no element; 'site' mode falls back to the current
+        // site's language inside resolveOutputLocale().
         return new TimeModel([
             'seconds' => $this->secondsForString($value),
             'showSeconds' => $showSeconds,
+            'outputLocale' => $this->resolveOutputLocale(null),
         ]);
     }
 
@@ -162,6 +171,36 @@ class ReadTime extends Component
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * Resolves the configured `outputLocale` mode to a concrete locale ID (or
+     * `null`) for the model. Keeping this in the service means {@see TimeModel}
+     * never sees the `'site'` keyword, the settings, or the element.
+     *
+     * - empty/null → `null` (the model follows the current application language).
+     * - `'site'` → the element's site language, or — on the element-less filter
+     *   path — the current site's language (preserving the "a site's language"
+     *   semantic rather than falling back to the CP user's language).
+     * - a specific locale ID → that locale, verbatim.
+     */
+    private function resolveOutputLocale(?ElementInterface $element): ?string
+    {
+        $mode = ReadTimePlugin::getInstance()->getSettings()->outputLocale;
+
+        if ($mode === null || $mode === '') {
+            return null;
+        }
+
+        if ($mode === Settings::OUTPUT_LOCALE_SITE) {
+            if ($element !== null) {
+                return $element->getSite()->language;
+            }
+
+            return Craft::$app->getSites()->getCurrentSite()->language;
+        }
+
+        return $mode;
+    }
 
     private function secondsForValue(mixed $element): int
     {

@@ -22,3 +22,14 @@
     disabled:     'wordsPerMinute' in overrides,
     warning:      'wordsPerMinute' in overrides ? configWarning('wordsPerMinute'),
 }) }}
+
+{{ forms.selectField({
+    label:        'Output Locale',
+    instructions: 'The language used for the human-readable read-time string (e.g. “2 minutes” vs “2 Minuten”). “Current language” keeps the existing behaviour (the output follows the active CP, site, or console language). “Content’s site language” formats each element in the language of the site it belongs to — recommended for multi-site installs. Choosing a specific language forces it everywhere. This only affects the human-readable string; numeric values are unaffected.',
+    id:           'outputLocale',
+    name:         'outputLocale',
+    options:      outputLocaleOptions,
+    value:        settings.outputLocale,
+    disabled:     'outputLocale' in overrides,
+    warning:      'outputLocale' in overrides ? configWarning('outputLocale'),
+}) }}

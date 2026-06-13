@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+- An `outputLocale` setting to control the language of the human-readable read-time string ([#20](https://github.com/jalendport/craft-readtime/issues/20)). Leave it empty to follow the current application language (unchanged default), set it to `site` to format each element in its own site's language (consistent across CP, front-end, and `resave/entries` on multi-site installs), or set a specific locale ID (e.g. `de-DE`) to force one language everywhere. Configurable in the plugin settings or via `config/read-time.php`. Only the human-readable string is affected; numeric values are unchanged.
+
 ## 3.0.0 - 2026-06-12
 
 > Craft 5 release. The 2.x line remains the Craft 4 line.
