@@ -12,4 +12,10 @@
 return [
     // The average reading speed, in words per minute.
     'wordsPerMinute' => 200,
+
+    // Minimum read time, in whole minutes. When greater than 0, read times are
+    // rounded up to at least this many minutes, so sub-minute content displays
+    // as e.g. "1 minute" instead of "less than a minute". 0 keeps the default
+    // behaviour.
+    'minimumReadTime' => 0,
 ];

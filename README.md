@@ -106,9 +106,18 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 {{ time.interval('%h hours, %i minutes, %s seconds') }}  {# 0 hours, 2 minutes, 40 seconds #}
 ```
 
+### Settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `wordsPerMinute` | `200` | The average reading speed, in words per minute, used to calculate the read time. |
+| `minimumReadTime` | `0` | Minimum read time, in whole minutes. When greater than `0`, read times are rounded **up** to at least this many minutes, so sub-minute (and empty) content displays as e.g. "1 minute" instead of "less than a minute". `0` keeps the default behaviour. |
+
+The minimum is applied at the source, so it is reflected consistently everywhere — `time.human`, `time.seconds`, `time.minutes`, `time.hours`, the `readTime()` function, the `|readTime` filter, and the GraphQL `readTime` field all agree.
+
 ### Overriding Plugin Settings
 
-The average user read speed is set at 200 words per minute by default. This can be changed in the plugin settings, or overridden with a config file.
+Both settings can be changed in the plugin settings in the Control Panel, or overridden with a config file.
 
 If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. An example is included at [`config/read-time.php`](config/read-time.php).
 
@@ -117,6 +126,7 @@ If you create a [config file](https://craftcms.com/docs/5.x/configure.html#confi
 
 return [
     'wordsPerMinute' => 200,
+    'minimumReadTime' => 0,
 ];
 ```
 
