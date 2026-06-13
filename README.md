@@ -63,6 +63,63 @@ Seconds are included by default, but can be disabled by passing `false` as a sec
 {{ readTime(entry.matrixField.all(), false) }}
 ```
 
+### Using GraphQL
+
+A `readTime` field is available on entry types in Craft's [GraphQL](https://craftcms.com/docs/5.x/development/graphql.html) API. It returns a `ReadTime` object type mirroring the [TimeModel](#timemodel), so GraphQL and Twig report the same read time for a given entry.
+
+```graphql
+{
+  entries(section: "blog", limit: 1) {
+    title
+    readTime {
+      seconds
+      minutes
+      hours
+      humanReadable
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "entries": [
+      {
+        "title": "Hello World",
+        "readTime": {
+          "seconds": 160,
+          "minutes": 2,
+          "hours": 0,
+          "humanReadable": "2 minutes, 40 seconds"
+        }
+      }
+    ]
+  }
+}
+```
+
+| Field | Returns |
+| --- | --- |
+| `seconds` | The total number of seconds. |
+| `minutes` | The total number of whole minutes. |
+| `hours` | The total number of whole hours. |
+| `humanReadable` | The human-readable duration. |
+
+Seconds are included in `humanReadable` by default. Pass `showSeconds: false` to the `readTime` field to omit them — this only affects `humanReadable`:
+
+```graphql
+{
+  entries(section: "blog", limit: 1) {
+    readTime(showSeconds: false) {
+      humanReadable
+    }
+  }
+}
+```
+
+The field resolves on demand from the same read time service used by the Twig function and filter, so it counts all supported field types (Matrix, Neo, Vizy, CKEditor). Read time is computed by walking an entry's field layout, so selecting `readTime` across a large entry query computes it per entry — request it only where you need it.
+
 ### Supported Field Types
 
 When you pass an entry to `readTime()`, the plugin walks its field layout and counts the content of each field, recursing into nested-block fields:
