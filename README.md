@@ -1,6 +1,18 @@
-<h1><img src="src/icon.svg" alt="icon" width="25" height="25" hspace="5">Read Time</h1>
+<p align="center"><img src="src/icon.svg" alt="Read Time" width="80" height="80"></p>
 
-_Calculate the estimated read time for content._
+<h1 align="center">Read Time</h1>
+
+<p align="center"><em>Calculate the estimated read time for content.</em></p>
+
+## Features
+
+- **Read time for any content** — a `readTime()` Twig function for a whole entry, and a `|readTime` filter for any string or value.
+- **Walks your field layout** — counts every custom field on an entry, recursing through nested blocks automatically.
+- **Nested field support** — Matrix, [Neo](https://github.com/spicywebau/craft-neo), [Vizy](https://verbb.io/craft-plugins/vizy), and [CKEditor](https://github.com/craftcms/ckeditor) (including embedded entries), all as optional soft dependencies.
+- **GraphQL ready** — a `readTime` field on entry types, resolving from the same service as Twig.
+- **Accurate counts** — HTML markup is stripped before counting, so tags and URLs don't inflate estimates.
+- **Multi-site aware** — pin the human-readable output to each site's own language, or force one locale everywhere.
+- **Configurable** — reading speed, output locale, and a minimum read time, all overridable per environment.
 
 ## Installation
 
@@ -130,7 +142,7 @@ When you pass an entry to `readTime()`, the plugin walks its field layout and co
 | **Matrix** (native) | On Craft 5, Matrix blocks are entrified — each block is an `Entry` element. Their nested fields are walked recursively. |
 | **Neo** ([`spicyweb/craft-neo`](https://github.com/spicywebau/craft-neo)) | Each Neo block's fields are walked recursively. |
 | **Vizy** ([`verbb/vizy`](https://verbb.io/craft-plugins/vizy)) | Rich-text content is counted and Vizy blocks' nested fields are walked recursively. |
-| **CKEditor** ([`craft/ckeditor`](https://github.com/craftcms/ckeditor)) | The editor's rich-text content is counted, plus the content of any entries embedded inside the field. |
+| **CKEditor** ([`craftcms/ckeditor`](https://github.com/craftcms/ckeditor)) | The editor's rich-text content is counted, plus the content of any entries embedded inside the field. |
 
 Neo, Vizy, and CKEditor are treated as optional, soft dependencies — the plugin loads and computes read time fine on sites that don't have them installed.
 
@@ -163,6 +175,8 @@ You can also format the duration as a [`DateInterval`](https://www.php.net/manua
 {{ time.interval('%h hours, %i minutes, %s seconds') }}  {# 0 hours, 2 minutes, 40 seconds #}
 ```
 
+## Configuration
+
 ### Settings
 
 | Setting | Default | Description |
@@ -193,7 +207,7 @@ In the Control Panel the dropdown lists _Current language_, _Content's site lang
 
 These settings can be changed in the plugin settings in the Control Panel, or overridden with a config file.
 
-If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. An example is included at [`config/read-time.php`](config/read-time.php).
+If you create a [config file](https://craftcms.com/docs/5.x/configure.html#config-files) in your `config` folder called `read-time.php`, you can override the plugin's settings in the Control Panel. Since that config file is fully [multi-environment](https://craftcms.com/docs/5.x/configure.html#multi-environment-configs) aware, this is a handy way to have different settings across multiple environments. A commented template you can copy is included at [`src/config.php`](src/config.php).
 
 ```php
 <?php
@@ -205,6 +219,10 @@ return [
 ];
 ```
 
-## Found a Bug? Need Support?
+## Support
 
-Please open an [issue](https://github.com/jalendport/craft-readtime/issues) describing what's going wrong.
+Found a bug or have a question? [Open an issue](https://github.com/jalendport/craft-readtime/issues).
+
+---
+
+<p align="center">Made by <a href="https://jalendport.com">Jalen Davenport</a></p>
