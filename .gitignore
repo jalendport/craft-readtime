@@ -1,5 +1,5 @@
-.DS_Store
 /vendor
-composer.lock
+/composer.lock
 /.phpunit.cache
-/.phpunit.result.cache
+/tmp
+.DS_Store

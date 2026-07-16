@@ -1,44 +1,55 @@
-name: CI
+name: ci
 
 on:
-  pull_request:
   push:
-    branches: [develop, master]
+    branches:
+      - develop
+      - master
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
-  test:
-    name: Pest (PHP ${{ matrix.php }})
+  ecs:
+    name: ecs
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jalendport/spark-github-actions/composer-install-dev@master
+        with:
+          php: "8.2"
+      - uses: jalendport/spark-github-actions/composer-run@master
+        with:
+          php: "8.2"
+          script: check-cs
 
+  phpstan:
+    name: phpstan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jalendport/spark-github-actions/composer-install-dev@master
+        with:
+          php: "8.2"
+      - uses: jalendport/spark-github-actions/composer-run@master
+        with:
+          php: "8.2"
+          script: phpstan
+
+  pest:
+    name: pest (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.2', '8.3', '8.4']
-
+        php: ["8.2", "8.3", "8.4"]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
+      - uses: jalendport/spark-github-actions/composer-install-dev@master
         with:
-          php-version: ${{ matrix.php }}
-          extensions: mbstring, dom, bcmath, intl, gd, zip, curl, pdo, pdo_mysql, fileinfo, openssl
-          coverage: none
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
+          php: ${{ matrix.php }}
+      - uses: jalendport/spark-github-actions/composer-run@master
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ matrix.php }}-${{ hashFiles('composer.json') }}
-          restore-keys: composer-${{ matrix.php }}-
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: Run test suite
-        run: composer test
+          php: ${{ matrix.php }}
+          script: test
