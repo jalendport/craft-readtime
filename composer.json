@@ -2,7 +2,6 @@
     "name": "jalendport/craft-readtime",
     "description": "Calculate the estimated read time for content.",
     "type": "craft-plugin",
-    "version": "3.1.0",
     "keywords": [
         "craft",
         "cms",
@@ -10,11 +9,7 @@
         "craft-plugin",
         "average read time"
     ],
-    "support": {
-        "docs": "https://github.com/jalendport/craft-readtime/blob/master/README.md",
-        "issues": "https://github.com/jalendport/craft-readtime/issues"
-    },
-    "license": "MIT",
+    "license": "mit",
     "authors": [
         {
             "name": "Jalen Davenport",
@@ -25,29 +20,42 @@
             "homepage": "https://github.com/lukeyouell"
         }
     ],
+    "support": {
+        "email": "hello@jalendport.com",
+        "issues": "https://github.com/jalendport/craft-readtime/issues?state=open",
+        "source": "https://github.com/jalendport/craft-readtime",
+        "docs": "https://github.com/jalendport/craft-readtime/blob/master/README.md",
+        "rss": "https://github.com/jalendport/craft-readtime/releases.atom"
+    },
     "require": {
         "php": "^8.2",
-        "craftcms/cms": "^5.0.0"
+        "craftcms/cms": "^5.0.0",
+        "jalendport/craft-base": "^1.1.1"
     },
     "require-dev": {
-        "pestphp/pest": "^3.0"
-    },
-    "suggest": {
-        "spicyweb/craft-neo": "Adds read time support for content stored in Neo fields.",
-        "verbb/vizy": "Adds read time support for content stored in Vizy fields.",
-        "craft/ckeditor": "Adds read time support for CKEditor fields, including nested entries."
+        "craftcms/ckeditor": "^4.0",
+        "craftcms/ecs": "dev-main",
+        "craftcms/phpstan": "dev-main",
+        "craftcms/rector": "dev-main",
+        "pestphp/pest": "^3.0",
+        "spicyweb/craft-neo": "^5.0",
+        "verbb/vizy": "^3.0"
     },
     "autoload": {
         "psr-4": {
-          "jalendport\\readtime\\": "src/"
+            "jalendport\\readtime\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-          "jalendport\\readtime\\tests\\": "tests/"
+            "jalendport\\readtime\\tests\\": "tests/"
         }
     },
     "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "yiisoft/yii2-composer": true,
@@ -55,14 +63,19 @@
         }
     },
     "scripts": {
+        "check-cs": "ecs check --ansi",
+        "fix-cs": "ecs check --ansi --fix",
+        "phpstan": "phpstan --memory-limit=1G",
         "test": "pest"
     },
     "extra": {
         "name": "Read Time",
         "handle": "read-time",
-        "hasCpSettings": true,
-        "hasCpSection": false,
+        "developer": "Jalen Davenport",
+        "documentationUrl": "https://github.com/jalendport/craft-readtime/blob/master/README.md",
         "changelogUrl": "https://raw.githubusercontent.com/jalendport/craft-readtime/master/CHANGELOG.md",
         "class": "jalendport\\readtime\\ReadTime"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
