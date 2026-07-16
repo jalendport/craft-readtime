@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 3.2.0 - 2026-07-16
+
 ### Added
 - Added a per-plugin log file at `storage/logs/read-time-*.log`
 - Added translation support for every control panel string
