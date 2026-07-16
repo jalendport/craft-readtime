@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\fieldhandlers;
 
 use benf\neo\Field as NeoField;
@@ -25,14 +23,27 @@ use jalendport\readtime\services\ReadTime;
  * to false via `instanceof` when Neo is not installed, so the plugin loads and
  * computes read time fine without it. Neo blocks are elements with their own
  * field layouts, so we recurse into each block.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 3.0.0
  */
 class NeoHandler implements FieldHandlerInterface
 {
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function canHandle(FieldInterface $field): bool
     {
         return $field instanceof NeoField;
     }
 
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $seconds = 0;

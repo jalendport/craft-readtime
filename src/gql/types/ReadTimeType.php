@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\gql\types;
 
 use craft\gql\base\ObjectType;
@@ -23,13 +21,23 @@ use jalendport\readtime\ReadTime as ReadTimePlugin;
  * The `ReadTime` GraphQL object type, mirroring {@see TimeModel}. It is resolved
  * from a {@see TimeModel} source produced by the read time service, so GraphQL
  * and Twig results stay in sync.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 3.1.0
  */
 class ReadTimeType extends ObjectType
 {
+    // Public Methods
+    // =========================================================================
+
     /**
      * Returns the GraphQL type name. Registered with the schema via
      * {@see \jalendport\readtime\ReadTime} so it can be referenced and
      * introspected.
+     *
+     * @return string the GraphQL type name
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.1.0
      */
     public static function getName(): string
     {
@@ -40,6 +48,10 @@ class ReadTimeType extends ObjectType
      * Returns the singleton GraphQL type, creating and registering it on first
      * use. Used both when registering the type and when building the `readTime`
      * field on entry types.
+     *
+     * @return mixed the registered GraphQL type
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.1.0
      */
     public static function getType(): mixed
     {
@@ -84,6 +96,10 @@ class ReadTimeType extends ObjectType
      * resolved on demand here — entries that do not request the field pay no
      * cost. Selecting `readTime` across a large entry query will compute it per
      * entry; callers should be mindful of that on broad queries.
+     *
+     * @return array<string, mixed> the `readTime` field definition
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.1.0
      */
     public static function getEntryFieldDefinition(): array
     {
@@ -102,15 +118,24 @@ class ReadTimeType extends ObjectType
             'resolve' => static function(mixed $source, array $arguments): TimeModel {
                 $showSeconds = $arguments['showSeconds'] ?? true;
 
-                return ReadTimePlugin::getInstance()
-                    ->getReadTime()
-                    ->calculateForElement($source, $showSeconds);
+                return ReadTimePlugin::$plugin->readTime->calculateForElement($source, $showSeconds);
             },
         ];
     }
 
+    // Protected Methods
+    // =========================================================================
+
     /**
      * Resolves each `ReadTime` field from the {@see TimeModel} source.
+     *
+     * @param mixed $source the TimeModel being resolved
+     * @param array<string, mixed> $arguments the field arguments
+     * @param mixed $context the query context
+     * @param ResolveInfo $resolveInfo the resolve info
+     * @return mixed the resolved field value
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.1.0
      */
     protected function resolve(mixed $source, array $arguments, mixed $context, ResolveInfo $resolveInfo): mixed
     {

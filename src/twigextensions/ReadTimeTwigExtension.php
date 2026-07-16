@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\twigextensions;
 
 use jalendport\readtime\models\TimeModel;
@@ -21,21 +19,20 @@ use Twig\TwigFunction;
 /**
  * Thin Twig wrapper. All counting/field-walking logic lives in the
  * {@see \jalendport\readtime\services\ReadTime} service.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 1.0.0
  */
 class ReadTimeTwigExtension extends AbstractExtension
 {
-    public function getName(): string
-    {
-        return 'readTime';
-    }
+    // Public Methods
+    // =========================================================================
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('readTime', [$this, 'readTimeFunction']),
-        ];
-    }
-
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.0.0
+     */
     public function getFilters(): array
     {
         return [
@@ -43,13 +40,53 @@ class ReadTimeTwigExtension extends AbstractExtension
         ];
     }
 
-    public function readTimeFunction(mixed $element, bool $showSeconds = true): TimeModel
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.0.0
+     */
+    public function getFunctions(): array
     {
-        return ReadTime::getInstance()->getReadTime()->calculateForElement($element, $showSeconds);
+        return [
+            new TwigFunction('readTime', [$this, 'readTimeFunction']),
+        ];
     }
 
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.0.0
+     */
+    public function getName(): string
+    {
+        return 'readTime';
+    }
+
+    /**
+     * Backs the `|readTime` Twig filter.
+     *
+     * @param mixed $value the value to count
+     * @param bool $showSeconds whether seconds are included in the human-readable duration
+     * @return TimeModel the resulting read time
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.0.0
+     */
     public function readTimeFilter(mixed $value = null, bool $showSeconds = true): TimeModel
     {
-        return ReadTime::getInstance()->getReadTime()->calculateForValue($value, $showSeconds);
+        return ReadTime::$plugin->readTime->calculateForValue($value, $showSeconds);
+    }
+
+    /**
+     * Backs the `readTime()` Twig function.
+     *
+     * @param mixed $element the element, element query, or raw value to count
+     * @param bool $showSeconds whether seconds are included in the human-readable duration
+     * @return TimeModel the resulting read time
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.0.0
+     */
+    public function readTimeFunction(mixed $element, bool $showSeconds = true): TimeModel
+    {
+        return ReadTime::$plugin->readTime->calculateForElement($element, $showSeconds);
     }
 }

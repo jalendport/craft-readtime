@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\fieldhandlers;
 
 use craft\base\ElementInterface;
@@ -25,14 +23,27 @@ use jalendport\readtime\services\ReadTime;
  * elements with their own field layouts, rather than the old `MatrixBlock`
  * elements. We walk each block entry's custom fields recursively, which also
  * covers nested-block fields inside a Matrix block.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 3.0.0
  */
 class MatrixHandler implements FieldHandlerInterface
 {
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function canHandle(FieldInterface $field): bool
     {
         return $field instanceof Matrix;
     }
 
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $seconds = 0;

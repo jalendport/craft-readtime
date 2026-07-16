@@ -6,8 +6,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 use jalendport\readtime\models\TimeModel;
 
 /**
@@ -24,7 +22,7 @@ function timeModel(int $seconds): TimeModel
     return new TimeModel(['seconds' => $seconds]);
 }
 
-it('reports zero across the board for empty content', function () {
+it('reports zero across the board for empty content', function() {
     $model = timeModel(0);
 
     expect($model->seconds())->toBe(0);
@@ -32,7 +30,7 @@ it('reports zero across the board for empty content', function () {
     expect($model->hours())->toBe(0);
 });
 
-it('floors sub-minute durations to zero minutes', function () {
+it('floors sub-minute durations to zero minutes', function() {
     $model = timeModel(59);
 
     expect($model->seconds())->toBe(59);
@@ -40,7 +38,7 @@ it('floors sub-minute durations to zero minutes', function () {
     expect($model->hours())->toBe(0);
 });
 
-it('counts exactly one minute at the 60-second boundary', function () {
+it('counts exactly one minute at the 60-second boundary', function() {
     $model = timeModel(60);
 
     expect($model->seconds())->toBe(60);
@@ -48,7 +46,7 @@ it('counts exactly one minute at the 60-second boundary', function () {
     expect($model->hours())->toBe(0);
 });
 
-it('counts exactly one hour (and 60 minutes) at the 3600-second boundary', function () {
+it('counts exactly one hour (and 60 minutes) at the 3600-second boundary', function() {
     $model = timeModel(3600);
 
     expect($model->seconds())->toBe(3600);
@@ -56,7 +54,7 @@ it('counts exactly one hour (and 60 minutes) at the 3600-second boundary', funct
     expect($model->hours())->toBe(1);
 });
 
-it('floors a one-hour-one-minute-one-second duration correctly', function () {
+it('floors a one-hour-one-minute-one-second duration correctly', function() {
     $model = timeModel(3661);
 
     expect($model->seconds())->toBe(3661);

@@ -6,8 +6,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 use jalendport\readtime\models\Settings;
 
 /**
@@ -18,18 +16,18 @@ use jalendport\readtime\models\Settings;
  * tests.
  */
 
-it('defaults wordsPerMinute to 200', function () {
+it('defaults wordsPerMinute to 200', function() {
     expect((new Settings())->wordsPerMinute)->toBe(200);
 });
 
-it('defaults minimumReadTime to 0', function () {
+it('defaults minimumReadTime to 0', function() {
     expect((new Settings())->minimumReadTime)->toBe(0);
 });
 
-it('defaults outputLocale to null', function () {
+it('defaults outputLocale to null', function() {
     expect((new Settings())->outputLocale)->toBeNull();
 });
 
-it('exposes the site keyword constant as "site"', function () {
+it('exposes the site keyword constant as "site"', function() {
     expect(Settings::OUTPUT_LOCALE_SITE)->toBe('site');
 });

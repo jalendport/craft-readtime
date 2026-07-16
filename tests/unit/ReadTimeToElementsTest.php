@@ -6,8 +6,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQueryInterface;
 use jalendport\readtime\services\ReadTime;
@@ -22,7 +20,7 @@ use jalendport\readtime\services\ReadTime;
  * hand-implement; only `ElementQueryInterface::all()` needs behaviour.
  */
 
-it('returns an empty array for a non-iterable, non-query value', function () {
+it('returns an empty array for a non-iterable, non-query value', function() {
     $service = new ReadTime();
 
     expect($service->toElements('just a string'))->toBe([]);
@@ -30,7 +28,7 @@ it('returns an empty array for a non-iterable, non-query value', function () {
     expect($service->toElements(null))->toBe([]);
 });
 
-it('returns the same elements for an array of ElementInterface', function () {
+it('returns the same elements for an array of ElementInterface', function() {
     $service = new ReadTime();
 
     $a = $this->createMock(ElementInterface::class);
@@ -39,7 +37,7 @@ it('returns the same elements for an array of ElementInterface', function () {
     expect($service->toElements([$a, $b]))->toBe([$a, $b]);
 });
 
-it('keeps only the ElementInterface items from a mixed iterable', function () {
+it('keeps only the ElementInterface items from a mixed iterable', function() {
     $service = new ReadTime();
 
     $a = $this->createMock(ElementInterface::class);
@@ -50,7 +48,7 @@ it('keeps only the ElementInterface items from a mixed iterable', function () {
     expect($service->toElements($mixed))->toBe([$a, $b]);
 });
 
-it('resolves an ElementQueryInterface via all() and returns its elements', function () {
+it('resolves an ElementQueryInterface via all() and returns its elements', function() {
     $service = new ReadTime();
 
     $a = $this->createMock(ElementInterface::class);
@@ -62,7 +60,7 @@ it('resolves an ElementQueryInterface via all() and returns its elements', funct
     expect($service->toElements($query))->toBe([$a, $b]);
 });
 
-it('returns an empty array for an empty iterable', function () {
+it('returns an empty array for an empty iterable', function() {
     $service = new ReadTime();
 
     expect($service->toElements([]))->toBe([]);

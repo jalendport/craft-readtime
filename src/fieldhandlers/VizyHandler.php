@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\fieldhandlers;
 
 use craft\base\ElementInterface;
@@ -27,14 +25,30 @@ use verbb\vizy\nodes\VizyBlock;
  * own field layout. We count the text of the rich-text nodes and recurse into
  * each block's nested fields, so e.g. a plain-text sub-field inside a Vizy block
  * is counted correctly (which rendering the field as HTML would miss).
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 3.0.0
  */
 class VizyHandler implements FieldHandlerInterface
 {
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function canHandle(FieldInterface $field): bool
     {
         return $field instanceof VizyField;
     }
 
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $value = $element->getFieldValue($field->handle);
@@ -45,9 +59,9 @@ class VizyHandler implements FieldHandlerInterface
 
         $seconds = 0;
 
-        foreach ($this->getNodes($value) as $node) {
+        foreach ($this->_getNodes($value) as $node) {
             if ($node instanceof VizyBlock) {
-                $blockElement = $this->getBlockElement($node);
+                $blockElement = $this->_getBlockElement($node);
 
                 if ($blockElement !== null) {
                     $seconds += $service->secondsForElement($blockElement);
@@ -57,25 +71,24 @@ class VizyHandler implements FieldHandlerInterface
             }
 
             // Plain rich-text node: count its rendered text.
-            $seconds += $service->secondsForString($this->nodeText($node));
+            $seconds += $service->secondsForString($this->_nodeText($node));
         }
 
         return $seconds;
     }
 
+    // Private Methods
+    // =========================================================================
+
     /**
-     * @return iterable<object>
+     * Returns the nested element wrapped by a Vizy block node.
+     *
+     * @param VizyBlock $node the block node
+     * @return ElementInterface|null the nested element, or null if it can't be resolved
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
      */
-    private function getNodes(object $value): iterable
-    {
-        if (method_exists($value, 'getNodes')) {
-            return $value->getNodes() ?? [];
-        }
-
-        return is_iterable($value) ? $value : [];
-    }
-
-    private function getBlockElement(VizyBlock $node): ?ElementInterface
+    private function _getBlockElement(VizyBlock $node): ?ElementInterface
     {
         foreach (['getBlockElement', 'getElement'] as $method) {
             if (method_exists($node, $method)) {
@@ -90,7 +103,32 @@ class VizyHandler implements FieldHandlerInterface
         return null;
     }
 
-    private function nodeText(object $node): string
+    /**
+     * Returns the nodes in a Vizy field value.
+     *
+     * @param object $value the Vizy field value
+     * @return iterable<object> the field's nodes
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
+    private function _getNodes(object $value): iterable
+    {
+        if (method_exists($value, 'getNodes')) {
+            return $value->getNodes() ?? [];
+        }
+
+        return is_iterable($value) ? $value : [];
+    }
+
+    /**
+     * Returns the text of a plain rich-text Vizy node.
+     *
+     * @param object $node the node to read
+     * @return string the node's text, or an empty string if it can't be read
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
+    private function _nodeText(object $node): string
     {
         foreach (['getText', 'renderNode', 'renderHtml'] as $method) {
             if (method_exists($node, $method)) {

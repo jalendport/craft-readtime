@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\fieldhandlers;
 
 use craft\base\ElementInterface;
@@ -27,14 +25,30 @@ use jalendport\readtime\services\ReadTime;
  * The field's own words are counted from its raw stored markup so the nested
  * entry placeholder tags aren't expanded into rendered entry HTML and counted
  * twice — each embedded entry is instead walked recursively as an element.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 3.0.0
  */
 class CkeditorHandler implements FieldHandlerInterface
 {
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function canHandle(FieldInterface $field): bool
     {
         return $field instanceof CkeditorField;
     }
 
+    /**
+     * @inheritdoc
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
+     */
     public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $value = $element->getFieldValue($field->handle);
@@ -46,23 +60,31 @@ class CkeditorHandler implements FieldHandlerInterface
         $raw = method_exists($value, 'getRawContent') ? $value->getRawContent() : (string)$value;
         $seconds = $service->secondsForString($raw);
 
-        foreach ($this->getNestedEntries($value) as $entry) {
+        foreach ($this->_getNestedEntries($value) as $entry) {
             $seconds += $service->secondsForElement($entry);
         }
 
         return $seconds;
     }
 
+    // Private Methods
+    // =========================================================================
+
     /**
-     * @return ElementInterface[]
+     * Returns the entries embedded inside a CKEditor field value.
+     *
+     * @param object $value the CKEditor field value
+     * @return ElementInterface[] the embedded entries
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
      */
-    private function getNestedEntries(object $value): array
+    private function _getNestedEntries(object $value): array
     {
         // CKEditor 4.x for Craft 5 exposes the embedded entries directly.
         if (method_exists($value, 'getEntries')) {
             $entries = $value->getEntries();
 
-            return is_iterable($entries) ? $this->onlyElements($entries) : [];
+            return is_iterable($entries) ? $this->_onlyElements($entries) : [];
         }
 
         // Fall back to walking the field's content chunks.
@@ -86,10 +108,14 @@ class CkeditorHandler implements FieldHandlerInterface
     }
 
     /**
-     * @param iterable<mixed> $items
-     * @return ElementInterface[]
+     * Filters an iterable down to the elements it contains.
+     *
+     * @param iterable<mixed> $items the items to filter
+     * @return ElementInterface[] the elements the iterable contains
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.0.0
      */
-    private function onlyElements(iterable $items): array
+    private function _onlyElements(iterable $items): array
     {
         $elements = [];
 

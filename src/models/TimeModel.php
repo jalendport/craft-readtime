@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 namespace jalendport\readtime\models;
 
 use Craft;
@@ -17,15 +15,27 @@ use craft\base\Model;
 use craft\helpers\DateTimeHelper;
 use Exception;
 
+/**
+ * A calculated read time, returned by both the `readTime()` Twig function and
+ * the `|readTime` filter.
+ *
+ * @author Jalen Davenport <hello@jalendport.com>
+ * @since 1.3.0
+ */
 class TimeModel extends Model
 {
+    // Public Properties
+    // =========================================================================
+
     /**
      * @var int Total read time, in seconds.
+     * @since 1.3.0
      */
     public int $seconds = 0;
 
     /**
      * @var bool Whether seconds are included in the human-readable duration.
+     * @since 1.3.0
      */
     public bool $showSeconds = true;
 
@@ -37,14 +47,33 @@ class TimeModel extends Model
      * {@see \jalendport\readtime\services\ReadTime} service resolves the
      * configured mode against the element/site before building the model, so
      * this value object stays free of element or settings logic.
+     * @since 3.1.0
      */
     public ?string $outputLocale = null;
 
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * Returns the human-readable duration, so the model can be output directly.
+     *
+     * @return string the human-readable duration
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
+     */
     public function __toString(): string
     {
         return $this->human();
     }
 
+    /**
+     * Returns the read time as a human-readable duration (e.g. “2 minutes,
+     * 40 seconds”).
+     *
+     * @return string the human-readable duration
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
+     */
     public function human(): string
     {
         if ($this->outputLocale === null) {
@@ -68,7 +97,13 @@ class TimeModel extends Model
     }
 
     /**
-     * @throws Exception
+     * Returns the read time formatted as a {@see \DateInterval}.
+     *
+     * @param string $format the DateInterval format string
+     * @return string the formatted interval
+     * @throws Exception if the current timestamp can't be resolved to a date
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
      */
     public function interval(string $format = '%h hours, %i minutes, %s seconds'): string
     {
@@ -81,18 +116,39 @@ class TimeModel extends Model
         return $interval->format($format);
     }
 
-    public function seconds(): int
+    /**
+     * Returns the total read time, in whole hours.
+     *
+     * @return int the read time, in hours
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
+     */
+    public function hours(): int
     {
-        return $this->seconds;
+        return (int)floor(($this->seconds / 60) / 60);
     }
 
+    /**
+     * Returns the total read time, in whole minutes.
+     *
+     * @return int the read time, in minutes
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
+     */
     public function minutes(): int
     {
         return (int)floor($this->seconds / 60);
     }
 
-    public function hours(): int
+    /**
+     * Returns the total read time, in seconds.
+     *
+     * @return int the read time, in seconds
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 1.3.0
+     */
+    public function seconds(): int
     {
-        return (int)floor(($this->seconds / 60) / 60);
+        return $this->seconds;
     }
 }

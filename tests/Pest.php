@@ -6,8 +6,6 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
-declare(strict_types=1);
-
 use jalendport\readtime\services\ReadTime;
 
 /*
@@ -23,16 +21,14 @@ use jalendport\readtime\services\ReadTime;
 
 function htmlToText(string $text): string
 {
-    $method = new ReflectionMethod(ReadTime::class, 'htmlToText');
-    $method->setAccessible(true);
+    $method = new ReflectionMethod(ReadTime::class, '_htmlToText');
 
     return $method->invoke(new ReadTime(), $text);
 }
 
 function countWords(mixed $value): int
 {
-    $method = new ReflectionMethod(ReadTime::class, 'countWords');
-    $method->setAccessible(true);
+    $method = new ReflectionMethod(ReadTime::class, '_countWords');
 
     return $method->invoke(new ReadTime(), $value);
 }
@@ -64,8 +60,7 @@ function readTimeServiceWithWpm(int $wordsPerMinute): ReadTime
 
 function wordsToSeconds(int $words, int $wordsPerMinute = 200): int
 {
-    $method = new ReflectionMethod(ReadTime::class, 'wordsToSeconds');
-    $method->setAccessible(true);
+    $method = new ReflectionMethod(ReadTime::class, '_wordsToSeconds');
 
     return $method->invoke(readTimeServiceWithWpm($wordsPerMinute), $words);
 }
