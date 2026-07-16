@@ -1,10 +1,13 @@
 <?php
 /**
- * Read Time config example.
+ * Read Time config.php
  *
- * Copy this file to your project's `config/` folder and rename it to
- * `read-time.php` to override the plugin's settings. The file is fully
- * multi-environment aware.
+ * This file exists only as a template. Don't edit it directly — copy it to your
+ * project's `config/` folder, rename it to `read-time.php`, and make your
+ * changes there. Any setting you leave out falls back to the value configured
+ * on the plugin's settings page.
+ *
+ * The file is fully multi-environment aware.
  *
  * @see https://craftcms.com/docs/5.x/configure.html#config-files
  */
