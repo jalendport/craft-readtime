@@ -1,5 +1,5 @@
 name: Support request
-description: You need a hand with setup or usage.
+description: You need a hand with plugin setup or usage.
 labels: [question]
 body:
   - type: textarea

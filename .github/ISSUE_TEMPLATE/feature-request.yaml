@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an improvement or new capability.
+description: Suggest an improvement or new plugin capability.
 labels: [enhancement]
 body:
   - type: textarea

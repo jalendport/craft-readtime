@@ -1,5 +1,6 @@
+.DS_Store
 /vendor
 /composer.lock
 /.phpunit.cache
 /tmp
-.DS_Store
+/.agents
