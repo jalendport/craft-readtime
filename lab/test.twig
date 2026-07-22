@@ -1,0 +1,153 @@
+{% set plugin = craft.app.plugins.getPlugin('read-time') %}
+{% set entry = craft.entries.section('labArticles').slug('read-time-lab').status(null).one() %}
+
+{# Expected values mirror the word counts seeded in lab/seed.php (200 wpm,
+   10 words = 3 seconds) — keep the two files in sync. #}
+{% set expected = {
+	labSummary: { label: 'Lab Summary (plain text)', words: 10, seconds: 3 },
+	labBody: { label: 'Lab Body (plain text)', words: 20, seconds: 6 },
+	labPlainText: { label: 'Lab Plain Text', words: 50, seconds: 15 },
+	labCkeditor: { label: 'Lab CKEditor', words: 100, seconds: 30 },
+	labMatrix: { label: 'Lab Matrix (2 blocks, text + CKEditor)', words: 90, seconds: 27 },
+	labNeo: { label: 'Lab Neo (1 block, text + nested Matrix)', words: 90, seconds: 27 },
+	labVizy: { label: 'Lab Vizy (2 rich-text paragraphs)', words: 100, seconds: 30 },
+} %}
+{% set expectedTotal = 138 %}
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Read Time smoke test</title>
+	</head>
+	<body>
+		<h1>Read Time smoke test</h1>
+		<dl>
+			<dt>plugin installed</dt>
+			<dd>{{ plugin ? 'yes' : 'no' }}</dd>
+
+			<dt>plugin version</dt>
+			<dd>{{ plugin ? plugin.version : 'n/a' }}</dd>
+
+			<dt>words per minute</dt>
+			<dd>{{ plugin ? plugin.settings.wordsPerMinute : 'n/a' }}</dd>
+
+			<dt>ckeditor installed</dt>
+			<dd>{{ craft.app.plugins.getPlugin('ckeditor') ? 'yes' : 'no' }}</dd>
+
+			<dt>neo installed</dt>
+			<dd>{{ craft.app.plugins.getPlugin('neo') ? 'yes' : 'no' }}</dd>
+
+			<dt>vizy installed</dt>
+			<dd>{{ craft.app.plugins.getPlugin('vizy') ? 'yes' : 'no' }}</dd>
+
+			<dt>lab entry found</dt>
+			<dd>{{ entry ? 'yes' : 'no' }}</dd>
+		</dl>
+
+		{% if entry %}
+			{% set actuals = {
+				labSummary: entry.labSummary|readTime,
+				labBody: entry.labBody|readTime,
+				labPlainText: entry.labPlainText|readTime,
+				labCkeditor: entry.labCkeditor|readTime,
+				labMatrix: readTime(entry.labMatrix),
+				labNeo: readTime(entry.labNeo),
+				labVizy: entry.labVizy|readTime,
+			} %}
+			{% set total = readTime(entry) %}
+			{# Counted up front (not in the table loop) because `set` inside a
+			   for loop is scoped to the iteration. #}
+			{% set failures = expected|filter((exp, handle) => actuals[handle].seconds() != exp.seconds)|length
+				+ (total.seconds() == expectedTotal ? 0 : 1) %}
+
+			<h2>Per-field read time</h2>
+			<table border="1" cellpadding="6">
+				<thead>
+					<tr>
+						<th>Field</th>
+						<th>Seeded words</th>
+						<th>Expected seconds</th>
+						<th>Actual seconds</th>
+						<th>Human</th>
+						<th>Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for handle, exp in expected %}
+						{% set actual = actuals[handle] %}
+						{% set pass = actual.seconds() == exp.seconds %}
+						<tr>
+							<td>{{ exp.label }} <code>{{ handle }}</code></td>
+							<td>{{ exp.words }}</td>
+							<td>{{ exp.seconds }}</td>
+							<td>{{ actual.seconds() }}</td>
+							<td>{{ actual.human() }}</td>
+							<td>{{ pass ? 'PASS' : 'FAIL' }}</td>
+						</tr>
+					{% endfor %}
+					<tr>
+						<td><strong>Whole entry</strong> <code>readTime(entry)</code></td>
+						<td>460</td>
+						<td>{{ expectedTotal }}</td>
+						<td>{{ total.seconds() }}</td>
+						<td>{{ total.human() }}</td>
+						<td>{{ total.seconds() == expectedTotal ? 'PASS' : 'FAIL' }}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h2>Verdict</h2>
+			<p id="verdict">{{ failures == 0 ? 'ALL PASS' : failures ~ ' FAILURES' }}</p>
+
+			<h2>Whole-entry breakdown</h2>
+			<dl>
+				<dt>seconds()</dt>
+				<dd>{{ total.seconds() }}</dd>
+
+				<dt>minutes()</dt>
+				<dd>{{ total.minutes() }}</dd>
+
+				<dt>human()</dt>
+				<dd>{{ total.human() }}</dd>
+
+				<dt>|readTime filter on a raw string (10 words)</dt>
+				<dd>{{ 'one two three four five six seven eight nine ten'|readTime.seconds() }}</dd>
+			</dl>
+		{% endif %}
+
+		{% if entry %}
+			<h2>Raw field values</h2>
+			<pre>
+layout fields: {% for f in entry.fieldLayout.customFields %}{{ f.handle }} {% endfor %}
+
+plain: [{{ (entry.labPlainText ~ '')|slice(0, 80) }}…]
+cke: [{{ (entry.labCkeditor ~ '')|slice(0, 80) }}…]
+matrix blocks: {{ entry.labMatrix.all()|length }}
+neo blocks: {{ entry.labNeo.all()|length }}
+vizy: [{{ (entry.labVizy ~ '')|slice(0, 80) }}…]
+			</pre>
+		{% endif %}
+
+		<h2>All lab articles</h2>
+		<table border="1" cellpadding="6">
+			<thead>
+				<tr>
+					<th>Entry</th>
+					<th>Seconds</th>
+					<th>Human</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for article in craft.entries.section('labArticles').all() %}
+					{% set rt = readTime(article) %}
+					<tr>
+						<td>{{ article.title }}</td>
+						<td>{{ rt.seconds() }}</td>
+						<td>{{ rt.human() }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</body>
+</html>
