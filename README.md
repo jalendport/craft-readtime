@@ -2,7 +2,7 @@
 
 <h1 align="center">Read Time</h1>
 
-<p align="center"><em>Calculate the estimated read time for content.</em></p>
+Read Time is a Craft CMS plugin that calculates the estimated read time for your content. It counts every custom field on an entry, including nested Matrix, Neo, Vizy and CKEditor content, and returns a human-readable duration in Twig or GraphQL.
 
 ## Features
 
