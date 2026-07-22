@@ -1,6 +1,6 @@
 {
   "name": "jalendport/craft-readtime",
-  "description": "Calculate the estimated read time for content.",
+  "description": "Estimated read times for Craft CMS entries, counting every field and nested block.",
   "type": "craft-plugin",
   "license": "mit",
   "keywords": [
