@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Fixed
+- Fixed a bug where Vizy rich-text content always counted as zero read time
+
 ## 3.2.0 - 2026-07-16
 
 ### Added

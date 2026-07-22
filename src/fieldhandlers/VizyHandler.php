@@ -123,6 +123,12 @@ class VizyHandler implements FieldHandlerInterface
     /**
      * Returns the text of a plain rich-text Vizy node.
      *
+     * An empty result falls through to the next method rather than returning:
+     * `getText()` only yields a node's own raw text, and container nodes like
+     * paragraphs keep their words in child text nodes — so for them it is
+     * always empty and the content must come from `renderNode()`, which
+     * renders the node including its children.
+     *
      * @param object $node the node to read
      * @return string the node's text, or an empty string if it can't be read
      * @author Jalen Davenport <hello@jalendport.com>
@@ -132,7 +138,11 @@ class VizyHandler implements FieldHandlerInterface
     {
         foreach (['getText', 'renderNode', 'renderHtml'] as $method) {
             if (method_exists($node, $method)) {
-                return (string)$node->$method();
+                $text = (string)$node->$method();
+
+                if ($text !== '') {
+                    return $text;
+                }
             }
         }
 
