@@ -6,6 +6,7 @@
  * @copyright Copyright (c) 2018 Jalen Davenport
  */
 
+use craft\base\ElementInterface;
 use jalendport\readtime\services\ReadTime;
 
 /*
@@ -68,4 +69,53 @@ function wordsToSeconds(int $words, int $wordsPerMinute = 200): int
 function secondsForString(mixed $value, int $wordsPerMinute = 200): int
 {
     return readTimeServiceWithWpm($wordsPerMinute)->secondsForString($value);
+}
+
+/*
+| The field handlers hand nested block elements back to the service via
+| `secondsForElement()`, which walks a real field layout and therefore needs a
+| booted Craft app. For handler delegation tests we stub that walk with a
+| fixed per-element cost and record which elements were handed over — the
+| handler's own logic (value unwrapping, node/chunk filtering) is what runs.
+*/
+
+function readTimeServiceWithStubbedWalk(int $secondsPerElement = 60, int $wordsPerMinute = 200): ReadTime
+{
+    return new class($secondsPerElement, $wordsPerMinute) extends ReadTime {
+        /**
+         * @var ElementInterface[]
+         */
+        public array $walkedElements = [];
+
+        public function __construct(
+            public int $secondsPerElement,
+            public int $fixedWordsPerMinute,
+        ) {
+            parent::__construct();
+        }
+
+        public function secondsForElement(ElementInterface $element): int
+        {
+            $this->walkedElements[] = $element;
+
+            return $this->secondsPerElement;
+        }
+
+        protected function getWordsPerMinute(): int
+        {
+            return $this->fixedWordsPerMinute;
+        }
+    };
+}
+
+/*
+| Handler `canHandle()` checks are plain `instanceof` tests against concrete
+| field classes, so the tests only need instances — never initialised,
+| configured fields. Reflection skips the constructor (and its `init()` chain,
+| which may reach for a booted Craft app or a plugin singleton).
+*/
+
+function fieldInstance(string $class): object
+{
+    return (new ReflectionClass($class))->newInstanceWithoutConstructor();
 }
