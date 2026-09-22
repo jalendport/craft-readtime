@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Added
+- Added support for Content Block fields, including Content Blocks nested inside Matrix and Neo blocks ([#40](https://github.com/jalendport/craft-readtime/issues/40))
+- Added element titles to the read time count
+
+### Changed
+- Changed the field walk to skip native non-text fields (relations, options, numbers, toggles, dates, links, and similar)
+
+### Deprecated
+- Deprecated `FieldHandlerInterface`; implement `WordCountHandlerInterface` instead
+- Deprecated `ReadTime::secondsForElement()` and `ReadTime::secondsForString()`; use `wordsForElement()` and `wordsForString()` instead
+
+### Fixed
+- Fixed a bug where each field's read time was rounded down separately, so short fields counted as zero and entries built from many small blocks were under-counted ([#40](https://github.com/jalendport/craft-readtime/issues/40))
+
 ## 3.2.1 - 2026-07-21
 
 ### Fixed

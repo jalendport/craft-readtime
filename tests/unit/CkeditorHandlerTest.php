@@ -89,9 +89,9 @@ it('counts the raw content with its markup stripped', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->with('ckeditorField')->willReturn($value);
 
-    $seconds = (new CkeditorHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new CkeditorHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(6);
+    expect($words)->toBe(20);
 });
 
 it('casts a value without getRawContent() to string', function() {
@@ -108,9 +108,9 @@ it('casts a value without getRawContent() to string', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $seconds = (new CkeditorHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new CkeditorHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(6);
+    expect($words)->toBe(20);
 });
 
 it('walks embedded entries on top of the raw content', function() {
@@ -124,10 +124,10 @@ it('walks embedded entries on top of the raw content', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new CkeditorHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new CkeditorHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(126);
+    expect($words)->toBe(420);
     expect($service->walkedElements)->toBe([$entryA, $entryB]);
 });
 
@@ -143,10 +143,10 @@ it('falls back to walking chunk entries when getEntries() is unavailable', funct
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new CkeditorHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new CkeditorHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(66);
+    expect($words)->toBe(220);
     expect($service->walkedElements)->toBe([$entry]);
 });
 
@@ -157,7 +157,7 @@ it('returns zero for a missing field value', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn(null);
 
-    $seconds = (new CkeditorHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new CkeditorHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(0);
+    expect($words)->toBe(0);
 });

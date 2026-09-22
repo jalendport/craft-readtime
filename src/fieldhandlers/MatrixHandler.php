@@ -13,7 +13,7 @@ namespace jalendport\readtime\fieldhandlers;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\fields\Matrix;
-use jalendport\readtime\base\FieldHandlerInterface;
+use jalendport\readtime\base\WordCountHandlerInterface;
 use jalendport\readtime\services\ReadTime;
 
 /**
@@ -27,7 +27,7 @@ use jalendport\readtime\services\ReadTime;
  * @author Jalen Davenport <hello@jalendport.com>
  * @since 3.0.0
  */
-class MatrixHandler implements FieldHandlerInterface
+class MatrixHandler implements WordCountHandlerInterface
 {
     /**
      * @inheritdoc
@@ -42,16 +42,16 @@ class MatrixHandler implements FieldHandlerInterface
     /**
      * @inheritdoc
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
+    public function getWordCount(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
-        $seconds = 0;
+        $words = 0;
 
         foreach ($service->getBlocks($element, $field) as $block) {
-            $seconds += $service->secondsForElement($block);
+            $words += $service->wordsForElement($block);
         }
 
-        return $seconds;
+        return $words;
     }
 }

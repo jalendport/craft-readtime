@@ -13,7 +13,7 @@ namespace jalendport\readtime\fieldhandlers;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\ckeditor\Field as CkeditorField;
-use jalendport\readtime\base\FieldHandlerInterface;
+use jalendport\readtime\base\WordCountHandlerInterface;
 use jalendport\readtime\services\ReadTime;
 
 /**
@@ -29,7 +29,7 @@ use jalendport\readtime\services\ReadTime;
  * @author Jalen Davenport <hello@jalendport.com>
  * @since 3.0.0
  */
-class CkeditorHandler implements FieldHandlerInterface
+class CkeditorHandler implements WordCountHandlerInterface
 {
     // Public Methods
     // =========================================================================
@@ -47,9 +47,9 @@ class CkeditorHandler implements FieldHandlerInterface
     /**
      * @inheritdoc
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
+    public function getWordCount(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $value = $element->getFieldValue($field->handle);
 
@@ -58,13 +58,13 @@ class CkeditorHandler implements FieldHandlerInterface
         }
 
         $raw = method_exists($value, 'getRawContent') ? $value->getRawContent() : (string)$value;
-        $seconds = $service->secondsForString($raw);
+        $words = $service->wordsForString($raw);
 
         foreach ($this->_getNestedEntries($value) as $entry) {
-            $seconds += $service->secondsForElement($entry);
+            $words += $service->wordsForElement($entry);
         }
 
-        return $seconds;
+        return $words;
     }
 
     // Private Methods

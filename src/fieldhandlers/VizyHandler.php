@@ -12,7 +12,7 @@ namespace jalendport\readtime\fieldhandlers;
 
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
-use jalendport\readtime\base\FieldHandlerInterface;
+use jalendport\readtime\base\WordCountHandlerInterface;
 use jalendport\readtime\services\ReadTime;
 use verbb\vizy\fields\VizyField;
 use verbb\vizy\nodes\VizyBlock;
@@ -29,7 +29,7 @@ use verbb\vizy\nodes\VizyBlock;
  * @author Jalen Davenport <hello@jalendport.com>
  * @since 3.0.0
  */
-class VizyHandler implements FieldHandlerInterface
+class VizyHandler implements WordCountHandlerInterface
 {
     // Public Methods
     // =========================================================================
@@ -47,9 +47,9 @@ class VizyHandler implements FieldHandlerInterface
     /**
      * @inheritdoc
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int
+    public function getWordCount(ElementInterface $element, FieldInterface $field, ReadTime $service): int
     {
         $value = $element->getFieldValue($field->handle);
 
@@ -57,24 +57,24 @@ class VizyHandler implements FieldHandlerInterface
             return 0;
         }
 
-        $seconds = 0;
+        $words = 0;
 
         foreach ($this->_getNodes($value) as $node) {
             if ($node instanceof VizyBlock) {
                 $blockElement = $this->_getBlockElement($node);
 
                 if ($blockElement !== null) {
-                    $seconds += $service->secondsForElement($blockElement);
+                    $words += $service->wordsForElement($blockElement);
                 }
 
                 continue;
             }
 
             // Plain rich-text node: count its rendered text.
-            $seconds += $service->secondsForString($this->_nodeText($node));
+            $words += $service->wordsForString($this->_nodeText($node));
         }
 
-        return $seconds;
+        return $words;
     }
 
     // Private Methods

@@ -15,19 +15,23 @@ use craft\base\FieldInterface;
 use jalendport\readtime\services\ReadTime;
 
 /**
- * A field handler knows how to count the read time of a single, specific field
- * type, in seconds.
+ * A word count handler knows how to count the words of a single, specific
+ * field type. Handlers for nested-block field types (Matrix, Neo, Vizy,
+ * CKEditor, Content Block) recurse back into the service via
+ * {@see ReadTime::wordsForElement()}.
  *
- * Counting in seconds per field floors every short field to zero on its own,
- * so the service now sums words across the whole walk and converts once.
- * Handlers implementing this interface still work — their seconds are
- * converted back to words — but the rounding they already did is lost.
+ * Handlers count words rather than seconds so the service can sum the whole
+ * walk first and convert to seconds once. Converting per field would floor
+ * each short field (a heading, a button label) to zero on its own.
  *
- * @deprecated in 3.3.0. Implement [[WordCountHandlerInterface]] instead.
+ * Adding support for a new field type means adding one handler and registering
+ * it via {@see ReadTime::EVENT_REGISTER_FIELD_HANDLERS} — no new branch in a
+ * giant conditional.
+ *
  * @author Jalen Davenport <hello@jalendport.com>
- * @since 3.0.0
+ * @since 3.3.0
  */
-interface FieldHandlerInterface
+interface WordCountHandlerInterface
 {
     /**
      * Whether this handler is responsible for counting the given field.
@@ -39,19 +43,19 @@ interface FieldHandlerInterface
      * @param FieldInterface $field the field to test
      * @return bool whether this handler counts the field
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
     public function canHandle(FieldInterface $field): bool;
 
     /**
-     * Returns the read time, in seconds, for the field's value on the element.
+     * Returns the number of words in the field's value on the element.
      *
      * @param ElementInterface $element the element the field belongs to
      * @param FieldInterface $field the field to count
      * @param ReadTime $service the read time service, for recursing into nested elements
-     * @return int the read time, in seconds
+     * @return int the number of words
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    public function getReadTimeSeconds(ElementInterface $element, FieldInterface $field, ReadTime $service): int;
+    public function getWordCount(ElementInterface $element, FieldInterface $field, ReadTime $service): int;
 }

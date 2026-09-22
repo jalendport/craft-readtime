@@ -12,15 +12,20 @@ namespace jalendport\readtime\services;
 
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\Entry;
 use craft\helpers\StringHelper;
 use jalendport\readtime\base\FieldHandlerInterface;
+use jalendport\readtime\base\WordCountHandlerInterface;
 use jalendport\readtime\events\RegisterFieldHandlersEvent;
 use jalendport\readtime\fieldhandlers\CkeditorHandler;
+use jalendport\readtime\fieldhandlers\ContentBlockHandler;
 use jalendport\readtime\fieldhandlers\MatrixHandler;
 use jalendport\readtime\fieldhandlers\NeoHandler;
+use jalendport\readtime\fieldhandlers\NonTextHandler;
 use jalendport\readtime\fieldhandlers\VizyHandler;
 use jalendport\readtime\models\Settings;
 use jalendport\readtime\models\TimeModel;
@@ -31,11 +36,16 @@ use Throwable;
  * The read time service holds all of the counting and field-walking logic. The
  * Twig extension is a thin wrapper that delegates here.
  *
- * Field walking is recursive: {@see secondsForElement()} walks an element's
- * custom fields, dispatching each to a {@see FieldHandlerInterface}. Handlers
- * for nested-block field types recurse back into {@see secondsForElement()},
- * which naturally supports arbitrary nesting (e.g. Matrix-in-Neo, entries
- * embedded in a CKEditor field that themselves contain a Matrix field).
+ * Field walking is recursive: {@see wordsForElement()} counts an element's
+ * title and walks its custom fields, dispatching each to a
+ * {@see WordCountHandlerInterface}. Handlers for nested-block field types
+ * recurse back into {@see wordsForElement()}, which naturally supports
+ * arbitrary nesting (e.g. Matrix-in-Neo, a Content Block inside a Matrix block,
+ * entries embedded in a CKEditor field that themselves contain a Matrix field).
+ *
+ * The walk sums words and converts to seconds exactly once at the end. Doing
+ * the conversion per field floored every short field to zero on its own, so a
+ * page built from many small fields under-counted badly.
  *
  * @author Jalen Davenport <hello@jalendport.com>
  * @since 3.0.0
@@ -70,7 +80,7 @@ class ReadTime extends Component
     private int $_depth = 0;
 
     /**
-     * @var FieldHandlerInterface[]|null The memoized field handlers.
+     * @var (WordCountHandlerInterface|FieldHandlerInterface)[]|null The memoized field handlers.
      * @see _getFieldHandlers()
      * @since 3.0.0
      */
@@ -94,8 +104,9 @@ class ReadTime extends Component
         // Resolve the output-locale mode against the element when we have one,
         // so 'site' mode picks up that element's site language.
         $context = $element instanceof ElementInterface ? $element : null;
+        $seconds = $this->_wordsToSeconds($this->_wordsForValue($element));
 
-        return $this->_makeTimeModel($this->_secondsForValue($element), $showSeconds, $context);
+        return $this->_makeTimeModel($seconds, $showSeconds, $context);
     }
 
     /**
@@ -112,7 +123,9 @@ class ReadTime extends Component
     {
         // The filter path has no element; 'site' mode falls back to the current
         // site's language inside _resolveOutputLocale().
-        return $this->_makeTimeModel($this->secondsForString($value), $showSeconds, null);
+        $seconds = $this->_wordsToSeconds($this->wordsForString($value));
+
+        return $this->_makeTimeModel($seconds, $showSeconds, null);
     }
 
     /**
@@ -131,40 +144,22 @@ class ReadTime extends Component
     }
 
     /**
-     * Returns the total read time, in seconds, for every custom field in the
-     * element's field layout.
+     * Returns the read time, in seconds, for the element's title and every
+     * custom field in its field layout.
+     *
+     * Converting a single element's words to seconds on its own floors the
+     * result, so a handler that sums several of these under-counts. Handlers
+     * should return words and let the service convert once.
      *
      * @param ElementInterface $element the element to walk
      * @return int the read time, in seconds
+     * @deprecated in 3.3.0. Use [[wordsForElement()]] instead.
      * @author Jalen Davenport <hello@jalendport.com>
      * @since 3.0.0
      */
     public function secondsForElement(ElementInterface $element): int
     {
-        $layout = $element->getFieldLayout();
-
-        if ($layout === null || $this->_depth >= self::MAX_DEPTH) {
-            return 0;
-        }
-
-        $this->_depth++;
-        $seconds = 0;
-
-        try {
-            foreach ($layout->getCustomFields() as $field) {
-                try {
-                    $seconds += $this->_secondsForField($element, $field);
-                } catch (Throwable $e) {
-                    // Never let a single field break read time on the front end.
-                    ReadTimePlugin::warning("Skipped field “{$field->handle}”: {$e->getMessage()}");
-                    continue;
-                }
-            }
-        } finally {
-            $this->_depth--;
-        }
-
-        return $seconds;
+        return $this->_wordsToSeconds($this->wordsForElement($element));
     }
 
     /**
@@ -172,12 +167,13 @@ class ReadTime extends Component
      *
      * @param mixed $value the value to count
      * @return int the read time, in seconds
+     * @deprecated in 3.3.0. Use [[wordsForString()]] instead.
      * @author Jalen Davenport <hello@jalendport.com>
      * @since 3.0.0
      */
     public function secondsForString(mixed $value): int
     {
-        return $this->_wordsToSeconds($this->_countWords($value));
+        return $this->_wordsToSeconds($this->wordsForString($value));
     }
 
     /**
@@ -210,6 +206,58 @@ class ReadTime extends Component
         return $elements;
     }
 
+    /**
+     * Returns the total number of words in the element's title and every custom
+     * field in its field layout, recursing into nested-block fields.
+     *
+     * @param ElementInterface $element the element to walk
+     * @return int the number of words
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.3.0
+     */
+    public function wordsForElement(ElementInterface $element): int
+    {
+        $layout = $element->getFieldLayout();
+
+        if ($layout === null || $this->_depth >= self::MAX_DEPTH) {
+            return 0;
+        }
+
+        $this->_depth++;
+
+        try {
+            $words = $this->_wordsForTitle($element);
+
+            foreach ($layout->getCustomFields() as $field) {
+                try {
+                    $words += $this->_wordsForField($element, $field);
+                } catch (Throwable $e) {
+                    // Never let a single field break read time on the front end.
+                    ReadTimePlugin::warning("Skipped field “{$field->handle}”: {$e->getMessage()}");
+                    continue;
+                }
+            }
+        } finally {
+            $this->_depth--;
+        }
+
+        return $words;
+    }
+
+    /**
+     * Returns the number of words in a plain text/HTML value. Markup is stripped
+     * first so tags and entities don't inflate the count.
+     *
+     * @param mixed $value the value to count
+     * @return int the number of words
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.3.0
+     */
+    public function wordsForString(mixed $value): int
+    {
+        return StringHelper::countWords($this->_htmlToText(StringHelper::toString($value)));
+    }
+
     // Protected Methods
     // =========================================================================
 
@@ -237,32 +285,22 @@ class ReadTime extends Component
     // =========================================================================
 
     /**
-     * @param mixed $value the value to count
-     * @return int the number of words
-     * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
-     */
-    private function _countWords(mixed $value): int
-    {
-        return StringHelper::countWords($this->_htmlToText(StringHelper::toString($value)));
-    }
-
-    /**
-     * @return FieldHandlerInterface[] the registered field handlers, in priority order
+     * @return (WordCountHandlerInterface|FieldHandlerInterface)[] the registered field handlers, in priority order
      * @author Jalen Davenport <hello@jalendport.com>
      * @since 3.0.0
      */
     private function _getFieldHandlers(): array
     {
         if ($this->_fieldHandlers === null) {
-            $event = new RegisterFieldHandlersEvent([
-                'handlers' => [
-                    new MatrixHandler(),
-                    new NeoHandler(),
-                    new VizyHandler(),
-                    new CkeditorHandler(),
-                ],
-            ]);
+            $event = new RegisterFieldHandlersEvent();
+            $event->handlers = [
+                new MatrixHandler(),
+                new NeoHandler(),
+                new VizyHandler(),
+                new CkeditorHandler(),
+                new ContentBlockHandler(),
+                new NonTextHandler(),
+            ];
 
             $this->trigger(self::EVENT_REGISTER_FIELD_HANDLERS, $event);
 
@@ -289,7 +327,7 @@ class ReadTime extends Component
     /**
      * Cleans a (possibly HTML) string so markup doesn't inflate its word count.
      * Rich-text fields (CKEditor, Vizy, etc.) and raw strings passed to the
-     * `readTime` Twig filter both route through here via {@see _countWords()},
+     * `readTime` Twig filter both route through here via {@see wordsForString()},
      * so the fix applies to every counting path.
      *
      * Behaviour:
@@ -387,33 +425,78 @@ class ReadTime extends Component
     }
 
     /**
+     * Converts a legacy handler's seconds back into words so the whole walk sums
+     * in one unit. The handler already floored, so this is best-effort.
+     *
+     * @param int $seconds the read time, in seconds
+     * @return int the equivalent number of words
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.3.0
+     */
+    private function _secondsToWords(int $seconds): int
+    {
+        return (int)round($seconds / 60 * $this->getWordsPerMinute());
+    }
+
+    /**
      * @param ElementInterface $element the element the field belongs to
      * @param FieldInterface $field the field to count
-     * @return int the read time, in seconds
+     * @return int the number of words
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    private function _secondsForField(ElementInterface $element, FieldInterface $field): int
+    private function _wordsForField(ElementInterface $element, FieldInterface $field): int
     {
         foreach ($this->_getFieldHandlers() as $handler) {
-            if ($handler->canHandle($field)) {
-                return $handler->getReadTimeSeconds($element, $field, $this);
+            if (!$handler->canHandle($field)) {
+                continue;
             }
+
+            if ($handler instanceof WordCountHandlerInterface) {
+                return $handler->getWordCount($element, $field, $this);
+            }
+
+            return $this->_secondsToWords($handler->getReadTimeSeconds($element, $field, $this));
         }
 
-        return $this->secondsForString($element->getFieldValue($field->handle));
+        return $this->wordsForString($element->getFieldValue($field->handle));
+    }
+
+    /**
+     * Returns the number of words in the element's title.
+     *
+     * An entry type without a title field generates its title from a title
+     * format, which duplicates field content that's already counted — so only
+     * author-entered titles count.
+     *
+     * @param ElementInterface $element the element whose title to count
+     * @return int the number of words
+     * @author Jalen Davenport <hello@jalendport.com>
+     * @since 3.3.0
+     */
+    private function _wordsForTitle(ElementInterface $element): int
+    {
+        if (!$element instanceof Element) {
+            return 0;
+        }
+
+        if ($element instanceof Entry && !$element->getType()->hasTitleField) {
+            return 0;
+        }
+
+        return $this->wordsForString($element->title);
     }
 
     /**
      * @param mixed $element the element, element query, or raw value to count
-     * @return int the read time, in seconds
+     * @return int the number of words
      * @author Jalen Davenport <hello@jalendport.com>
-     * @since 3.0.0
+     * @since 3.3.0
      */
-    private function _secondsForValue(mixed $element): int
+    private function _wordsForValue(mixed $element): int
     {
         if ($element instanceof ElementInterface) {
-            return $this->secondsForElement($element);
+            return $this->wordsForElement($element);
         }
 
         // A Matrix/Neo field value (query, collection or array of block elements)
@@ -421,17 +504,17 @@ class ReadTime extends Component
         $elements = $this->toElements($element);
 
         if ($elements !== []) {
-            $seconds = 0;
+            $words = 0;
 
             foreach ($elements as $item) {
-                $seconds += $this->secondsForElement($item);
+                $words += $this->wordsForElement($item);
             }
 
-            return $seconds;
+            return $words;
         }
 
         // Fall back to counting the value as plain content.
-        return $this->secondsForString($element);
+        return $this->wordsForString($element);
     }
 
     /**

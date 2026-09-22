@@ -2,13 +2,13 @@
 
 <h1 align="center">Read Time</h1>
 
-Read Time is a Craft CMS plugin that calculates the estimated read time for your content. It counts every custom field on an entry, including nested Matrix, Neo, Vizy and CKEditor content, and returns a human-readable duration in Twig or GraphQL.
+Read Time is a Craft CMS plugin that calculates the estimated read time for your content. It counts every custom field on an entry, including nested Matrix, Content Block, Neo, Vizy and CKEditor content, and returns a human-readable duration in Twig or GraphQL.
 
 ## Features
 
 - **Read time for any content** — a `readTime()` Twig function for a whole entry, and a `|readTime` filter for any string or value.
-- **Walks your field layout** — counts every custom field on an entry, recursing through nested blocks automatically.
-- **Nested field support** — Matrix, [Neo](https://github.com/spicywebau/craft-neo), [Vizy](https://verbb.io/craft-plugins/vizy), and [CKEditor](https://github.com/craftcms/ckeditor) (including embedded entries), all as optional soft dependencies.
+- **Walks your field layout** — counts the title and every custom field on an entry, recursing through nested blocks automatically and skipping non-text fields.
+- **Nested field support** — Matrix, Content Block, [Neo](https://github.com/spicywebau/craft-neo), [Vizy](https://verbb.io/craft-plugins/vizy), and [CKEditor](https://github.com/craftcms/ckeditor) (including embedded entries), the plugins as optional soft dependencies.
 - **GraphQL ready** — a `readTime` field on entry types, resolving from the same service as Twig.
 - **Accurate counts** — HTML markup is stripped before counting, so tags and URLs don't inflate estimates.
 - **Multi-site aware** — pin the human-readable output to each site's own language, or force one locale everywhere.
@@ -130,21 +130,24 @@ Seconds are included in `humanReadable` by default. Pass `showSeconds: false` to
 }
 ```
 
-The field resolves on demand from the same read time service used by the Twig function and filter, so it counts all supported field types (Matrix, Neo, Vizy, CKEditor). Read time is computed by walking an entry's field layout, so selecting `readTime` across a large entry query computes it per entry — request it only where you need it.
+The field resolves on demand from the same read time service used by the Twig function and filter, so it counts all supported field types (Matrix, Content Block, Neo, Vizy, CKEditor). Read time is computed by walking an entry's field layout, so selecting `readTime` across a large entry query computes it per entry — request it only where you need it.
 
 ### Supported Field Types
 
-When you pass an entry to `readTime()`, the plugin walks its field layout and counts the content of each field, recursing into nested-block fields:
+When you pass an entry to `readTime()`, the plugin counts its title, then walks its field layout and counts the content of each field, recursing into nested-block fields. Words are summed across the whole walk and converted to seconds once, so a heading or button label is never rounded down to zero on its own.
 
 | Field type | Notes |
 | --- | --- |
 | Plain text / rich text (e.g. Redactor, Plain Text) | Counted directly. |
-| **Matrix** (native) | On Craft 5, Matrix blocks are entrified — each block is an `Entry` element. Their nested fields are walked recursively. |
+| **Matrix** (native) | On Craft 5, Matrix blocks are entrified — each block is an `Entry` element. Their titles (when the block type has a title field) and nested fields are walked recursively. |
+| **Content Block** (native, Craft 5.8+) | The single nested element's fields are walked recursively, including Content Blocks inside Matrix or Neo blocks. |
 | **Neo** ([`spicyweb/craft-neo`](https://github.com/spicywebau/craft-neo)) | Each Neo block's fields are walked recursively. |
 | **Vizy** ([`verbb/vizy`](https://verbb.io/craft-plugins/vizy)) | Rich-text content is counted and Vizy blocks' nested fields are walked recursively. |
 | **CKEditor** ([`craftcms/ckeditor`](https://github.com/craftcms/ckeditor)) | The editor's rich-text content is counted, plus the content of any entries embedded inside the field. |
 
 Neo, Vizy, and CKEditor are treated as optional, soft dependencies — the plugin loads and computes read time fine on sites that don't have them installed.
+
+Native fields whose values aren't readable text count as zero words: relations (Assets, Entries, Categories, Tags, Users, Addresses), options (Dropdown, Checkboxes, Radio Buttons, Multi-select, Button Group), Number, Range, Money, Lightswitch, Date, Time, Link, Email, Color, Icon, JSON and Country. Any other field type — including third-party rich-text fields — is counted from its string value.
 
 > **Super Table is no longer supported.** It does not exist for Craft 5, so it has been removed from the Craft 5 code path. Super Table support remains in the Craft 4 (2.x) line.
 

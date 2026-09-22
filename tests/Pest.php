@@ -14,10 +14,10 @@ use jalendport\readtime\services\ReadTime;
 | Helpers
 |--------------------------------------------------------------------------
 |
-| The counting helpers on the ReadTime service are private, so they're
-| exercised through reflection. `htmlToText()` is pure string-cleaning (no
-| Craft application needed) and `countWords()` only delegates to
-| `craft\helpers\StringHelper`, so neither requires a booted Craft instance.
+| `htmlToText()` is private on the ReadTime service, so it's exercised through
+| reflection; it is pure string-cleaning (no Craft application needed). The
+| public `wordsForString()` only delegates to `craft\helpers\StringHelper`, so
+| it doesn't need a booted Craft instance either.
 */
 
 function htmlToText(string $text): string
@@ -29,9 +29,7 @@ function htmlToText(string $text): string
 
 function countWords(mixed $value): int
 {
-    $method = new ReflectionMethod(ReadTime::class, '_countWords');
-
-    return $method->invoke(new ReadTime(), $value);
+    return (new ReadTime())->wordsForString($value);
 }
 
 /*
@@ -73,32 +71,32 @@ function secondsForString(mixed $value, int $wordsPerMinute = 200): int
 
 /*
 | The field handlers hand nested block elements back to the service via
-| `secondsForElement()`, which walks a real field layout and therefore needs a
+| `wordsForElement()`, which walks a real field layout and therefore needs a
 | booted Craft app. For handler delegation tests we stub that walk with a
-| fixed per-element cost and record which elements were handed over — the
-| handler's own logic (value unwrapping, node/chunk filtering) is what runs.
+| fixed per-element word count and record which elements were handed over —
+| the handler's own logic (value unwrapping, node/chunk filtering) is what runs.
 */
 
-function readTimeServiceWithStubbedWalk(int $secondsPerElement = 60, int $wordsPerMinute = 200): ReadTime
+function readTimeServiceWithStubbedWalk(int $wordsPerElement = 200, int $wordsPerMinute = 200): ReadTime
 {
-    return new class($secondsPerElement, $wordsPerMinute) extends ReadTime {
+    return new class($wordsPerElement, $wordsPerMinute) extends ReadTime {
         /**
          * @var ElementInterface[]
          */
         public array $walkedElements = [];
 
         public function __construct(
-            public int $secondsPerElement,
+            public int $wordsPerElement,
             public int $fixedWordsPerMinute,
         ) {
             parent::__construct();
         }
 
-        public function secondsForElement(ElementInterface $element): int
+        public function wordsForElement(ElementInterface $element): int
         {
             $this->walkedElements[] = $element;
 
-            return $this->secondsPerElement;
+            return $this->wordsPerElement;
         }
 
         protected function getWordsPerMinute(): int

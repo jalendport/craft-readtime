@@ -17,7 +17,7 @@ use jalendport\readtime\fieldhandlers\MatrixHandler;
  *
  * The handler only unwraps the field value through the service's
  * `getBlocks()`/`toElements()` normaliser and hands each block element back to
- * `secondsForElement()`, which is stubbed here — so interface doubles are all
+ * `wordsForElement()`, which is stubbed here — so interface doubles are all
  * that's needed and no booted Craft application is involved.
  */
 
@@ -38,10 +38,10 @@ it('sums the walk of every block element', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->with('matrixField')->willReturn([$blockA, $blockB]);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new MatrixHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new MatrixHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(120);
+    expect($words)->toBe(400);
     expect($service->walkedElements)->toBe([$blockA, $blockB]);
 });
 
@@ -56,10 +56,10 @@ it('resolves an unexecuted block query before walking', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($query);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new MatrixHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new MatrixHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(60);
+    expect($words)->toBe(200);
     expect($service->walkedElements)->toBe([$block]);
 });
 
@@ -70,8 +70,8 @@ it('returns zero when the field has no blocks', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn([]);
 
-    $service = readTimeServiceWithStubbedWalk(60);
+    $service = readTimeServiceWithStubbedWalk(200);
 
-    expect((new MatrixHandler())->getReadTimeSeconds($element, $field, $service))->toBe(0);
+    expect((new MatrixHandler())->getWordCount($element, $field, $service))->toBe(0);
     expect($service->walkedElements)->toBe([]);
 });

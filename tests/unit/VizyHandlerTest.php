@@ -66,10 +66,6 @@ it('handles Vizy fields and nothing else', function() {
 });
 
 it('falls back to the rendered node when getText() is empty, so paragraphs are counted', function() {
-    // Regression: container nodes like paragraphs keep their words in child
-    // text nodes, so their own `getText()` is always empty. The handler used
-    // to return that empty result as final, counting every paragraph — and
-    // therefore most real-world Vizy content — as zero seconds.
     $field = fieldInstance(VizyField::class);
     $field->handle = 'vizyField';
 
@@ -80,9 +76,9 @@ it('falls back to the rendered node when getText() is empty, so paragraphs are c
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->with('vizyField')->willReturn($value);
 
-    $seconds = (new VizyHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new VizyHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(6);
+    expect($words)->toBe(20);
 });
 
 it('counts a node from its own text when getText() has content', function() {
@@ -96,9 +92,9 @@ it('counts a node from its own text when getText() has content', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $seconds = (new VizyHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new VizyHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(3);
+    expect($words)->toBe(10);
 });
 
 it('sums every rich-text node in the collection', function() {
@@ -113,9 +109,9 @@ it('sums every rich-text node in the collection', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $seconds = (new VizyHandler())->getReadTimeSeconds($element, $field, readTimeServiceWithWpm(200));
+    $words = (new VizyHandler())->getWordCount($element, $field, readTimeServiceWithWpm(200));
 
-    expect($seconds)->toBe(18);
+    expect($words)->toBe(60);
 });
 
 it('walks block nodes as elements and adds them to the rich-text total', function() {
@@ -134,10 +130,10 @@ it('walks block nodes as elements and adds them to the rich-text total', functio
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn($value);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new VizyHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new VizyHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(66);
+    expect($words)->toBe(220);
     expect($service->walkedElements)->toBe([$blockElement]);
 });
 
@@ -154,6 +150,6 @@ it('returns zero for an empty or missing field value', function() {
     $missing = $this->createMock(ElementInterface::class);
     $missing->method('getFieldValue')->willReturn(null);
 
-    expect($handler->getReadTimeSeconds($empty, $field, $service))->toBe(0);
-    expect($handler->getReadTimeSeconds($missing, $field, $service))->toBe(0);
+    expect($handler->getWordCount($empty, $field, $service))->toBe(0);
+    expect($handler->getWordCount($missing, $field, $service))->toBe(0);
 });

@@ -16,7 +16,7 @@ use jalendport\readtime\fieldhandlers\NeoHandler;
  * Unit coverage for {@see NeoHandler}.
  *
  * Mirrors {@see MatrixHandlerTest}: the handler unwraps blocks through the
- * service and hands each one to the stubbed `secondsForElement()` walk, so no
+ * service and hands each one to the stubbed `wordsForElement()` walk, so no
  * booted Craft application (or installed Neo plugin) is needed — the real
  * `benf\neo\Field` from `require-dev` is only instantiated, constructor-free,
  * for the `instanceof` check.
@@ -40,10 +40,10 @@ it('sums the walk of every block element', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->with('neoField')->willReturn([$blockA, $blockB]);
 
-    $service = readTimeServiceWithStubbedWalk(60);
-    $seconds = (new NeoHandler())->getReadTimeSeconds($element, $field, $service);
+    $service = readTimeServiceWithStubbedWalk(200);
+    $words = (new NeoHandler())->getWordCount($element, $field, $service);
 
-    expect($seconds)->toBe(120);
+    expect($words)->toBe(400);
     expect($service->walkedElements)->toBe([$blockA, $blockB]);
 });
 
@@ -54,8 +54,8 @@ it('returns zero when the field has no blocks', function() {
     $element = $this->createMock(ElementInterface::class);
     $element->method('getFieldValue')->willReturn([]);
 
-    $service = readTimeServiceWithStubbedWalk(60);
+    $service = readTimeServiceWithStubbedWalk(200);
 
-    expect((new NeoHandler())->getReadTimeSeconds($element, $field, $service))->toBe(0);
+    expect((new NeoHandler())->getWordCount($element, $field, $service))->toBe(0);
     expect($service->walkedElements)->toBe([]);
 });
