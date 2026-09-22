@@ -8,11 +8,13 @@
 	labBody: { label: 'Lab Body (plain text)', words: 20, seconds: 6 },
 	labPlainText: { label: 'Lab Plain Text', words: 50, seconds: 15 },
 	labCkeditor: { label: 'Lab CKEditor', words: 100, seconds: 30 },
-	labMatrix: { label: 'Lab Matrix (2 blocks, text + CKEditor)', words: 90, seconds: 27 },
+	labMatrix: { label: 'Lab Matrix (3 blocks: text + CKEditor, text, page builder)', words: 170, seconds: 51 },
+	labPageBuilderBlock: { label: 'Lab Matrix page-builder block only (10-word title + Content Block)', words: 80, seconds: 24 },
 	labNeo: { label: 'Lab Neo (1 block, text + nested Matrix)', words: 90, seconds: 27 },
 	labVizy: { label: 'Lab Vizy (2 rich-text paragraphs)', words: 100, seconds: 30 },
+	labContentBlock: { label: 'Lab Content Block (text + CKEditor)', words: 70, seconds: 21 },
 } %}
-{% set expectedTotal = 138 %}
+{% set expectedTotal = 186 %}
 
 <!doctype html>
 <html lang="en">
@@ -52,8 +54,10 @@
 				labPlainText: entry.labPlainText|readTime,
 				labCkeditor: entry.labCkeditor|readTime,
 				labMatrix: readTime(entry.labMatrix),
+				labPageBuilderBlock: readTime(entry.labMatrix.type('labMatrixPageBuilder').all()),
 				labNeo: readTime(entry.labNeo),
 				labVizy: entry.labVizy|readTime,
+				labContentBlock: readTime(entry.labContentBlock),
 			} %}
 			{% set total = readTime(entry) %}
 			{# Counted up front (not in the table loop) because `set` inside a
@@ -87,8 +91,8 @@
 						</tr>
 					{% endfor %}
 					<tr>
-						<td><strong>Whole entry</strong> <code>readTime(entry)</code></td>
-						<td>460</td>
+						<td><strong>Whole entry</strong> <code>readTime(entry)</code> (title + all fields; non-text fields count 0)</td>
+						<td>620</td>
 						<td>{{ expectedTotal }}</td>
 						<td>{{ total.seconds() }}</td>
 						<td>{{ total.human() }}</td>
@@ -123,9 +127,11 @@ layout fields: {% for f in entry.fieldLayout.customFields %}{{ f.handle }} {% en
 
 plain: [{{ (entry.labPlainText ~ '')|slice(0, 80) }}…]
 cke: [{{ (entry.labCkeditor ~ '')|slice(0, 80) }}…]
-matrix blocks: {{ entry.labMatrix.all()|length }}
+matrix blocks: {{ entry.labMatrix.all()|length }} (types: {% for block in entry.labMatrix.all() %}{{ block.type.handle }}{{ block.title ? ' "' ~ block.title ~ '"' }} {% endfor %})
 neo blocks: {{ entry.labNeo.all()|length }}
 vizy: [{{ (entry.labVizy ~ '')|slice(0, 80) }}…]
+content block: [{{ (entry.labContentBlock.labContentBlockBody ~ '')|slice(0, 80) }}…]
+lightswitch: {{ entry.labLightswitch ? 'on' : 'off' }} · link: {{ entry.labLink }} · related entries: {{ entry.labEntries.all()|length }}
 			</pre>
 		{% endif %}
 
