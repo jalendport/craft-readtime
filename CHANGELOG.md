@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 3.3.0 - 2026-09-21
+
 ### Added
 - Added support for Content Block fields, including Content Blocks nested inside Matrix and Neo blocks ([#40](https://github.com/jalendport/craft-readtime/issues/40))
 - Added element titles to the read time count
